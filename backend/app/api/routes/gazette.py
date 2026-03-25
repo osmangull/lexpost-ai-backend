@@ -37,11 +37,18 @@ async def get_update(update_id: str):
 async def refresh_today():
     """
     Bugüne ait DB kaydı yoksa gazeteyi scrape eder.
+    Ayrıca 5 günden eski kayıtları temizler.
     Uygulama pull-to-refresh sırasında çağırır.
     """
+    from datetime import timedelta
     db = get_supabase()
     today = date.today().isoformat()
 
+    # 5 günden eski kayıtları sil
+    cutoff = (date.today() - timedelta(days=5)).isoformat()
+    db.table("legal_updates").delete().lt("gazette_date", cutoff).execute()
+
+    # Bugün zaten scrape edildiyse dur
     existing = (
         db.table("legal_updates")
         .select("id")
