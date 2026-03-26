@@ -271,10 +271,10 @@ def _strip_madde_prefix(text: str) -> str:
     return re.sub(r'^MADDE\s+\d+\s*[–\-—:.]?\s*', '', text, flags=re.IGNORECASE).strip()
 
 
-def _build_body(scored: list[tuple[float, str]], title: str, document_type: str) -> str:
+def _build_body(scored: list[tuple[float, str]], title: str, document_type: str) -> Optional[str]:
     """
     En yüksek puanlı, kaliteli cümleyi seç.
-    Hiç kaliteli cümle yoksa başlıktan anlamlı özet türet.
+    Hiç kaliteli cümle yoksa None döndür (fallback içerik üretme).
     """
     for score, sent in scored:
         if _is_clean_sentence(sent, title):
@@ -284,8 +284,7 @@ def _build_body(scored: list[tuple[float, str]], title: str, document_type: str)
                 return cut + "."
             return clean
 
-    # PDF kaliteli içerik vermedi — başlıktan türet
-    return _title_to_summary(title, document_type)
+    return None
 
 
 def _build_bullets(
@@ -354,6 +353,11 @@ def summarize_legal_text_sync(title: str, raw_content: str, document_type: str =
     scored = _tfidf_score(sentences)
 
     body = _build_body(scored, title, document_type)
+    if body is None:
+        # PDF'den anlamlı içerik çıkarılamadı — boş bırak, editörde başlık görünsün
+        logger.info(f"Özet üretilemedi (yetersiz içerik): '{title[:50]}'")
+        return ""
+
     bullets = _build_bullets(articles, scored, effective_date, title, document_type)
     cta = _build_cta(document_type, institution)
 
