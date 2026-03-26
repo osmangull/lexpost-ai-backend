@@ -62,12 +62,13 @@ async def _run_idempotent_scrape():
 
 async def start_scheduler():
     _scheduler.add_job(_run_nightly_job,       CronTrigger(hour=0,  minute=10), id="gazette_nightly",  replace_existing=True)
+    _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=1,  minute=0),  id="gazette_retry_01", replace_existing=True)
+    _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=2,  minute=0),  id="gazette_retry_02", replace_existing=True)
     _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=3,  minute=0),  id="gazette_retry_03", replace_existing=True)
     _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=6,  minute=0),  id="gazette_retry_06", replace_existing=True)
     _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=9,  minute=0),  id="gazette_retry_09", replace_existing=True)
-    _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=12, minute=0),  id="gazette_retry_12", replace_existing=True)
     _scheduler.start()
-    logger.info("Scheduler started: nightly at 00:10, retries at 03:00/06:00/09:00/12:00 TRT")
+    logger.info("Scheduler started: nightly at 00:10, retries at 01:00/02:00/03:00/06:00/09:00 TRT")
 
 
 async def stop_scheduler():
