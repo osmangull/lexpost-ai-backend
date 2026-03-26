@@ -33,35 +33,21 @@ async def get_update(update_id: str):
     return result.data
 
 
-@router.post("/refresh-today")
-async def refresh_today():
+@router.get("/today-count")
+async def today_count():
     """
-    Bugüne ait DB kaydı yoksa gazeteyi scrape eder.
-    Ayrıca 5 günden eski kayıtları temizler.
-    Uygulama pull-to-refresh sırasında çağırır.
+    Bugüne ait DB'deki kayıt sayısını döner.
+    Pull-to-refresh'te gazeteyi scrape etmeden veri tazeliğini kontrol etmek için kullanılır.
     """
-    from datetime import timedelta
     db = get_supabase()
     today = date.today().isoformat()
-
-    # 5 günden eski kayıtları sil
-    cutoff = (date.today() - timedelta(days=5)).isoformat()
-    db.table("legal_updates").delete().lt("gazette_date", cutoff).execute()
-
-    # Bugün zaten scrape edildiyse dur
-    existing = (
+    result = (
         db.table("legal_updates")
-        .select("id")
+        .select("id", count="exact")
         .eq("gazette_date", today)
-        .limit(1)
         .execute()
     )
-
-    if existing.data:
-        return {"scraped": False, "message": "Bugün zaten güncel."}
-
-    updates = await process_daily_gazette()
-    return {"scraped": True, "new_count": len(updates)}
+    return {"date": today, "count": result.count or 0}
 
 
 @router.post("/scrape")
