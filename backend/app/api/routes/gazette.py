@@ -55,3 +55,25 @@ async def trigger_scrape(target_date: Optional[date] = None):
     """Manually trigger a gazette scrape (admin use)."""
     updates = await process_daily_gazette(target_date)
     return {"message": f"Scraped and saved {len(updates)} updates", "count": len(updates)}
+
+
+@router.post("/scrape-if-needed")
+async def scrape_if_needed():
+    """
+    Harici cron servisi (cron-job.org) tarafından çağrılır.
+    Bugün zaten veri varsa hiçbir şey yapmaz.
+    """
+    from datetime import timedelta
+    db = get_supabase()
+    today = date.today().isoformat()
+
+    existing = db.table("legal_updates").select("id").eq("gazette_date", today).limit(1).execute()
+    if existing.data:
+        return {"scraped": False, "message": "Already up to date."}
+
+    updates = await process_daily_gazette()
+
+    cutoff = (date.today() - timedelta(days=5)).isoformat()
+    db.table("legal_updates").delete().lt("gazette_date", cutoff).execute()
+
+    return {"scraped": True, "new_count": len(updates)}
