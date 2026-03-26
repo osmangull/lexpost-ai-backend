@@ -4,6 +4,17 @@ from pydantic import BaseModel
 from app.db.models import FontStyle, PostStatus
 
 
+class ManualPostRequest(BaseModel):
+    user_image_base64: str
+    custom_text: str = ""
+    font_style: FontStyle = FontStyle.CLASSIC
+    user_id: str
+
+
+class ManualPostResponse(BaseModel):
+    image_url: str
+
+
 class GeneratePostRequest(BaseModel):
     legal_update_id: str
     template_id: Optional[str] = None

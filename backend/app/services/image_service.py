@@ -75,6 +75,28 @@ def _parse_summary_parts(ai_summary: str) -> tuple[str, list[str], str]:
     return body, bullets[:2], cta
 
 
+async def generate_manual_post(
+    user_image_base64: str,
+    custom_text: str,
+    font_style: FontStyle,
+    user_id: str,
+) -> str:
+    """Manuel gönderi: kullanıcının görseli üzerine metin yaz, URL döndür."""
+    background_source = base64.b64decode(user_image_base64)
+    body, bullets, cta = _prepare_custom_text(custom_text) if custom_text.strip() else ("", [], "")
+
+    image_bytes = render_post_image(background_source, "", body, bullets, cta, font_style)
+
+    db = get_supabase()
+    filename = f"{user_id}/manual_{uuid.uuid4().hex[:8]}.jpg"
+    db.storage.from_("generated-posts").upload(
+        path=filename,
+        file=image_bytes,
+        file_options={"content-type": "image/jpeg"},
+    )
+    return db.storage.from_("generated-posts").get_public_url(filename)
+
+
 async def generate_and_store_post(
     legal_update_id: str,
     font_style: FontStyle,
