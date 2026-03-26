@@ -86,7 +86,7 @@ def _wrap_text(text: str, font: ImageFont.FreeTypeFont, max_width: int, draw: Im
 
 
 def render_post_image(
-    background_path: str,
+    background_source: "str | bytes",
     title: str,
     summary_body: str,
     bullets: list[str],
@@ -97,7 +97,7 @@ def render_post_image(
     Render a 1080x1080 post image and return as JPEG bytes.
 
     Args:
-        background_path: Absolute path to background .jpg/.png
+        background_source: Absolute path string OR raw image bytes (user-uploaded)
         title: Bold headline text
         summary_body: 1-2 sentence body text
         bullets: List of exactly 2 bullet point strings
@@ -105,7 +105,10 @@ def render_post_image(
         font_style: Classic (Playfair) or Modern (Montserrat)
     """
     # Load and resize background
-    bg = Image.open(background_path).convert("RGB")
+    if isinstance(background_source, bytes):
+        bg = Image.open(io.BytesIO(background_source)).convert("RGB")
+    else:
+        bg = Image.open(background_source).convert("RGB")
     bg = bg.resize(CANVAS_SIZE, Image.LANCZOS)
     bg = bg.filter(ImageFilter.GaussianBlur(radius=1.5))  # subtle blur for depth
     image = _add_dark_overlay(bg)

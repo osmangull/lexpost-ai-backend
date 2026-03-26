@@ -16,6 +16,7 @@ async def generate_post(request: GeneratePostRequest):
             font_style=request.font_style,
             user_id=request.user_id,
             custom_text=request.custom_text,
+            user_image_base64=request.user_image_base64,
         )
         return post
     except ValueError as e:

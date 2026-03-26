@@ -1,3 +1,4 @@
+import base64
 import logging
 import re
 import unicodedata
@@ -76,13 +77,17 @@ def _parse_summary_parts(ai_summary: str) -> tuple[str, list[str], str]:
 
 async def generate_and_store_post(
     legal_update_id: str,
-    template_id: str,
     font_style: FontStyle,
     user_id: str,
+    template_id: str = None,
     custom_text: str = None,
+    user_image_base64: str = None,
 ) -> dict:
     """Generate post image, upload to Supabase Storage, persist record."""
     db = get_supabase()
+
+    if not template_id and not user_image_base64:
+        raise ValueError("template_id or user_image_base64 must be provided")
 
     # Fetch legal update
     update_res = db.table("legal_updates").select("*").eq("id", legal_update_id).single().execute()
@@ -90,27 +95,29 @@ async def generate_and_store_post(
     if not update:
         raise ValueError(f"Legal update {legal_update_id} not found")
 
-    # Fetch template background
-    template_res = db.table("templates").select("*").eq("id", template_id).single().execute()
-    template = template_res.data
-    if not template:
-        raise ValueError(f"Template {template_id} not found")
+    # Background: şablon dosyası veya kullanıcının görseli (base64)
+    if user_image_base64:
+        background_source = base64.b64decode(user_image_base64)
+    else:
+        template_res = db.table("templates").select("*").eq("id", template_id).single().execute()
+        template = template_res.data
+        if not template:
+            raise ValueError(f"Template {template_id} not found")
+        background_source = str(Path(settings.backgrounds_dir) / template["background_filename"])
 
-    background_path = Path(settings.backgrounds_dir) / template["background_filename"]
     ai_summary = update.get("ai_summary") or ""
-
-    # Başlık direkt legal update'ten alınır — uzunluk sınırı yok, engine satır sararak gösterir
     image_title = update.get("title", "Hukuki Güncelleme")
 
     if custom_text and custom_text.strip():
         body, bullets, cta = _prepare_custom_text(custom_text)
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
-    image_bytes = render_post_image(str(background_path), image_title, body, bullets, cta, font_style)
+
+    image_bytes = render_post_image(background_source, image_title, body, bullets, cta, font_style)
 
     # Upload to Supabase Storage
     filename = f"{user_id}/{legal_update_id}_{uuid.uuid4().hex[:8]}.jpg"
-    upload_res = db.storage.from_("generated-posts").upload(
+    db.storage.from_("generated-posts").upload(
         path=filename,
         file=image_bytes,
         file_options={"content-type": "image/jpeg"},
@@ -121,7 +128,7 @@ async def generate_and_store_post(
     record = {
         "user_id": user_id,
         "legal_update_id": legal_update_id,
-        "template_id": template_id,
+        "template_id": template_id,  # None when user image used
         "font_style": font_style.value,
         "image_url": image_url,
         "caption": f"{image_title}\n\n{body}",

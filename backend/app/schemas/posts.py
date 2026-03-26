@@ -6,7 +6,8 @@ from app.db.models import FontStyle, PostStatus
 
 class GeneratePostRequest(BaseModel):
     legal_update_id: str
-    template_id: str
+    template_id: Optional[str] = None
+    user_image_base64: Optional[str] = None  # kullanıcının kendi görseli (base64 JPEG)
     font_style: FontStyle = FontStyle.CLASSIC
     user_id: str
     custom_text: Optional[str] = None
@@ -15,7 +16,7 @@ class GeneratePostRequest(BaseModel):
 class GeneratedPostOut(BaseModel):
     id: str
     legal_update_id: str
-    template_id: str
+    template_id: Optional[str]
     font_style: FontStyle
     image_url: str
     caption: str
