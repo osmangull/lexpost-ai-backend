@@ -147,13 +147,24 @@ def render_post_image(
     draw.rectangle([(PADDING, y_cursor), (PADDING + 160, y_cursor + 3)], fill=ACCENT_COLOR)
     y_cursor += 24
 
-    # --- Body (özet cümlesi) ---
+    # --- Body ---
+    # Kullanıcı \n ile paragraf bölmüş olabilir; her paragrafı word-wrap ile render et
     if summary_body and summary_body.strip():
-        body_lines = _wrap_text(summary_body, font_body, TEXT_AREA_WIDTH, draw)
-        for line in body_lines[:3]:  # max 3 satır
-            draw.text((PADDING, y_cursor), line, font=font_body, fill=BODY_COLOR)
-            y_cursor += FONT_SIZES["body"] + 5
-        y_cursor += 18
+        paragraphs = [p.strip() for p in summary_body.split("\n") if p.strip()]
+        rendered = 0
+        for para in paragraphs:
+            if rendered >= 5:  # toplam max 5 satır
+                break
+            wrapped = _wrap_text(para, font_body, TEXT_AREA_WIDTH, draw)
+            for line in wrapped:
+                if rendered >= 5:
+                    break
+                draw.text((PADDING, y_cursor), line, font=font_body, fill=BODY_COLOR)
+                y_cursor += FONT_SIZES["body"] + 5
+                rendered += 1
+            if len(paragraphs) > 1:
+                y_cursor += 6  # paragraflar arası boşluk
+        y_cursor += 14
 
     # --- Bullets (varsa göster, yoksa atla) ---
     for bullet in bullets[:2]:

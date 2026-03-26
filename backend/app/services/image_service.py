@@ -35,7 +35,7 @@ def _parse_summary_parts(ai_summary: str) -> tuple[str, list[str], str]:
         else:
             body_lines.append(line)
 
-    body = " ".join(body_lines)
+    body = "\n".join(body_lines)
     # Bullet yoksa boş döndür — engine bullet bölümünü atlar
     return body, bullets[:2], cta
 
