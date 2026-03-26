@@ -10,7 +10,7 @@ import textwrap
 from pathlib import Path
 from typing import Optional
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps
 
 from app.config import get_settings
 from app.db.models import FontStyle
@@ -106,9 +106,10 @@ def render_post_image(
     """
     # Load and resize background
     if isinstance(background_source, bytes):
-        bg = Image.open(io.BytesIO(background_source)).convert("RGB")
+        bg = Image.open(io.BytesIO(background_source))
     else:
-        bg = Image.open(background_source).convert("RGB")
+        bg = Image.open(background_source)
+    bg = ImageOps.exif_transpose(bg).convert("RGB")
     bg = bg.resize(CANVAS_SIZE, Image.LANCZOS)
     bg = bg.filter(ImageFilter.GaussianBlur(radius=1.5))  # subtle blur for depth
     image = _add_dark_overlay(bg)
