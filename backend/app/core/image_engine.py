@@ -148,25 +148,35 @@ def render_post_image(
     y_cursor += 24
 
     # --- Body ---
-    # Kullanıcı \n ile paragraf bölmüş olabilir; her paragrafı word-wrap ile render et
+    # • ile başlayan satırlar inline bullet olarak, diğerleri normal paragraf olarak çizilir.
     if summary_body and summary_body.strip():
         paragraphs = [p.strip() for p in summary_body.split("\n") if p.strip()]
         rendered = 0
         for para in paragraphs:
-            if rendered >= 5:  # toplam max 5 satır
+            if rendered >= 6:
                 break
-            wrapped = _wrap_text(para, font_body, TEXT_AREA_WIDTH, draw)
-            for line in wrapped:
-                if rendered >= 5:
-                    break
-                draw.text((PADDING, y_cursor), line, font=font_body, fill=BODY_COLOR)
-                y_cursor += FONT_SIZES["body"] + 5
-                rendered += 1
-            if len(paragraphs) > 1:
-                y_cursor += 6  # paragraflar arası boşluk
-        y_cursor += 14
+            is_bullet = para.startswith("•")
+            text = para.lstrip("• ").strip() if is_bullet else para
+            font_para = font_bullet if is_bullet else font_body
+            size_para = FONT_SIZES["bullet"] if is_bullet else FONT_SIZES["body"]
+            indent = 28 if is_bullet else 0
+            max_w = TEXT_AREA_WIDTH - indent
 
-    # --- Bullets (varsa göster, yoksa atla) ---
+            if is_bullet:
+                draw.text((PADDING, y_cursor), "▸", font=font_bullet, fill=ACCENT_COLOR)
+
+            wrapped = _wrap_text(text, font_para, max_w, draw)
+            for line in wrapped:
+                if rendered >= 6:
+                    break
+                draw.text((PADDING + indent, y_cursor), line, font=font_para,
+                          fill=BULLET_TEXT_COLOR if is_bullet else BODY_COLOR)
+                y_cursor += size_para + 5
+                rendered += 1
+            y_cursor += 4
+        y_cursor += 10
+
+    # --- Bullets (ai_summary'den parse edilenler — custom_text'te boş gelir) ---
     for bullet in bullets[:2]:
         if not bullet.strip():
             continue

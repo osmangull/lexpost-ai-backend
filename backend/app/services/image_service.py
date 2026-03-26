@@ -68,9 +68,12 @@ async def generate_and_store_post(
     # Başlık direkt legal update'ten alınır — uzunluk sınırı yok, engine satır sararak gösterir
     image_title = update.get("title", "Hukuki Güncelleme")
 
-    # Kullanıcı custom_text verdiyse onu kullan, yoksa ai_summary'den parse et
     if custom_text and custom_text.strip():
-        body, bullets, cta = _parse_summary_parts(custom_text)
+        # Kullanıcı metni: yapısal parse yok.
+        # • ile başlayan satırlar engine tarafından inline bullet olarak render edilir.
+        body = custom_text.strip()
+        bullets = []
+        cta = "Detaylar için resmi gazeteyi inceleyin."
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
     image_bytes = render_post_image(str(background_path), image_title, body, bullets, cta, font_style)
