@@ -1,5 +1,6 @@
 import logging
 import re
+import unicodedata
 import uuid
 from pathlib import Path
 
@@ -10,6 +11,39 @@ from app.db.supabase_client import get_supabase
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+
+def _strip_unsupported(text: str) -> str:
+    """Emoji ve font dışı Unicode karakterleri kaldırır."""
+    return "".join(
+        ch for ch in text
+        if unicodedata.category(ch) not in ("So", "Cs")  # Symbol-other, Surrogate
+        and ord(ch) < 0xFFFD
+    ).strip()
+
+
+def _prepare_custom_text(custom_text: str) -> tuple[str, list[str], str]:
+    """
+    Kullanıcının düzenlediği metni image engine için hazırlar.
+    - ⚖️ / 'Avukatlar için not:' satırını CTA olarak ayırır
+    - Emoji ve desteklenmeyen karakterleri temizler
+    - Kalan satırları body olarak döndürür (• satırları dahil)
+    """
+    cta = "Detaylar için resmi gazeteyi inceleyin."
+    body_lines = []
+
+    for raw_line in custom_text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if "Avukatlar için" in line or "\u2696" in line:
+            cleaned = re.sub(r".*Avukatlar için not:\s*", "", line).strip()
+            if cleaned:
+                cta = _strip_unsupported(cleaned)
+            continue
+        body_lines.append(_strip_unsupported(line))
+
+    return "\n".join(body_lines), [], cta
 
 
 def _parse_summary_parts(ai_summary: str) -> tuple[str, list[str], str]:
@@ -69,11 +103,7 @@ async def generate_and_store_post(
     image_title = update.get("title", "Hukuki Güncelleme")
 
     if custom_text and custom_text.strip():
-        # Kullanıcı metni: yapısal parse yok.
-        # • ile başlayan satırlar engine tarafından inline bullet olarak render edilir.
-        body = custom_text.strip()
-        bullets = []
-        cta = "Detaylar için resmi gazeteyi inceleyin."
+        body, bullets, cta = _prepare_custom_text(custom_text)
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
     image_bytes = render_post_image(str(background_path), image_title, body, bullets, cta, font_style)

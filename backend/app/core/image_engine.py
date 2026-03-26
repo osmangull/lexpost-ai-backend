@@ -153,7 +153,7 @@ def render_post_image(
         paragraphs = [p.strip() for p in summary_body.split("\n") if p.strip()]
         rendered = 0
         for para in paragraphs:
-            if rendered >= 6:
+            if rendered >= 10:
                 break
             is_bullet = para.startswith("•")
             text = para.lstrip("• ").strip() if is_bullet else para
@@ -163,11 +163,11 @@ def render_post_image(
             max_w = TEXT_AREA_WIDTH - indent
 
             if is_bullet:
-                draw.text((PADDING, y_cursor), "▸", font=font_bullet, fill=ACCENT_COLOR)
+                draw.text((PADDING, y_cursor), "-", font=font_bullet, fill=ACCENT_COLOR)
 
             wrapped = _wrap_text(text, font_para, max_w, draw)
             for line in wrapped:
-                if rendered >= 6:
+                if rendered >= 10:
                     break
                 draw.text((PADDING + indent, y_cursor), line, font=font_para,
                           fill=BULLET_TEXT_COLOR if is_bullet else BODY_COLOR)
@@ -180,10 +180,10 @@ def render_post_image(
     for bullet in bullets[:2]:
         if not bullet.strip():
             continue
-        draw.text((PADDING, y_cursor), "▸", font=font_bullet, fill=ACCENT_COLOR)
-        bullet_lines = _wrap_text(bullet, font_bullet, TEXT_AREA_WIDTH - 32, draw)
+        draw.text((PADDING, y_cursor), "-", font=font_bullet, fill=ACCENT_COLOR)
+        bullet_lines = _wrap_text(bullet, font_bullet, TEXT_AREA_WIDTH - 20, draw)
         for line in bullet_lines:
-            draw.text((PADDING + 28, y_cursor), line, font=font_bullet, fill=BULLET_TEXT_COLOR)
+            draw.text((PADDING + 20, y_cursor), line, font=font_bullet, fill=BULLET_TEXT_COLOR)
             y_cursor += FONT_SIZES["bullet"] + 4
         y_cursor += 8
 
