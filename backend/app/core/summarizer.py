@@ -368,8 +368,57 @@ def summarize_legal_text_sync(title: str, raw_content: str, document_type: str =
 
 
 async def summarize_legal_text(title: str, raw_content: str, document_type: str = "Karar") -> str:
-    """Async wrapper — gazette_service.py ile uyumluluk için."""
+    """Groq ile özet üret. Başarısız olursa TF-IDF fallback'e geç."""
+    from app.config import get_settings
+    settings = get_settings()
+
+    if settings.groq_api_key:
+        try:
+            result = await _summarize_with_groq(title, raw_content, document_type, settings.groq_api_key)
+            if result:
+                return result
+        except Exception as e:
+            logger.warning(f"Groq summarization failed, falling back to TF-IDF: {e}")
+
     return summarize_legal_text_sync(title, raw_content, document_type)
+
+
+async def _summarize_with_groq(title: str, raw_content: str, document_type: str, api_key: str) -> str:
+    """Groq API ile Türkçe hukuki özet üret."""
+    from groq import AsyncGroq
+
+    content_preview = raw_content[:3000].strip()
+
+    prompt = f"""Aşağıdaki Türk Resmi Gazetesi {document_type} metnini avukatlar için özetle.
+
+Başlık: {title}
+
+İçerik:
+{content_preview}
+
+Yanıtını TAM OLARAK bu formatta ver, başka hiçbir şey ekleme:
+[Tek cümlelik ana özet. Ne hakkında olduğunu net açıkla.]
+• [Birinci önemli madde veya etki]
+• [İkinci önemli madde veya etki]
+⚖️ Avukatlar için not: [Bu belgeyle ilgili avukatların dikkat etmesi gereken pratik bilgi]
+
+Kurallar:
+- Türkçe yaz
+- Gerçek içeriğe dayan, uydurma
+- Her bölüm tek cümle olsun
+- Emoji kullanma (⚖️ hariç)"""
+
+    client = AsyncGroq(api_key=api_key)
+    response = await client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+        max_tokens=300,
+    )
+
+    result = response.choices[0].message.content.strip()
+    logger.info(f"Groq özet üretildi: '{title[:50]}'")
+    return result
 
 
 async def generate_social_caption(summary: str, document_type: str) -> str:

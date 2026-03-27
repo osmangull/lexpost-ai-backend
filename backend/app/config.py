@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     supabase_anon_key: str
     supabase_service_role_key: str
 
+    # AI
+    groq_api_key: str = ""
+
     # Firebase
     firebase_credentials_path: str = "firebase-credentials.json"
 
