@@ -2,7 +2,6 @@ import base64
 import logging
 import re
 import unicodedata
-import uuid
 from pathlib import Path
 
 from app.config import get_settings
@@ -75,49 +74,24 @@ def _parse_summary_parts(ai_summary: str) -> tuple[str, list[str], str]:
     return body, bullets[:2], cta
 
 
-async def generate_manual_post(
-    user_image_base64: str,
-    custom_text: str,
-    font_style: FontStyle,
-    user_id: str,
-) -> str:
-    """Manuel gönderi: kullanıcının görseli üzerine metin yaz, URL döndür."""
-    background_source = base64.b64decode(user_image_base64)
-    body, bullets, cta = _prepare_custom_text(custom_text) if custom_text.strip() else ("", [], "")
-
-    image_bytes = render_post_image(background_source, "", body, bullets, cta, font_style)
-
-    db = get_supabase()
-    filename = f"{user_id}/manual_{uuid.uuid4().hex[:8]}.jpg"
-    db.storage.from_("generated-posts").upload(
-        path=filename,
-        file=image_bytes,
-        file_options={"content-type": "image/jpeg"},
-    )
-    return db.storage.from_("generated-posts").get_public_url(filename)
-
-
-async def generate_and_store_post(
+async def generate_post_image(
     legal_update_id: str,
     font_style: FontStyle,
-    user_id: str,
     template_id: str = None,
     custom_text: str = None,
     user_image_base64: str = None,
-) -> dict:
-    """Generate post image, upload to Supabase Storage, persist record."""
+) -> bytes:
+    """Görsel oluştur ve JPEG bytes döndür. DB/Storage kaydı yapılmaz."""
     db = get_supabase()
 
     if not template_id and not user_image_base64:
         raise ValueError("template_id or user_image_base64 must be provided")
 
-    # Fetch legal update
     update_res = db.table("legal_updates").select("*").eq("id", legal_update_id).single().execute()
     update = update_res.data
     if not update:
         raise ValueError(f"Legal update {legal_update_id} not found")
 
-    # Background: şablon dosyası veya kullanıcının görseli (base64)
     if user_image_base64:
         background_source = base64.b64decode(user_image_base64)
     else:
@@ -135,26 +109,15 @@ async def generate_and_store_post(
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
 
-    image_bytes = render_post_image(background_source, image_title, body, bullets, cta, font_style)
+    return render_post_image(background_source, image_title, body, bullets, cta, font_style)
 
-    # Upload to Supabase Storage
-    filename = f"{user_id}/{legal_update_id}_{uuid.uuid4().hex[:8]}.jpg"
-    db.storage.from_("generated-posts").upload(
-        path=filename,
-        file=image_bytes,
-        file_options={"content-type": "image/jpeg"},
-    )
-    image_url = db.storage.from_("generated-posts").get_public_url(filename)
 
-    # Persist post record
-    record = {
-        "user_id": user_id,
-        "legal_update_id": legal_update_id,
-        "template_id": template_id,  # None when user image used
-        "font_style": font_style.value,
-        "image_url": image_url,
-        "caption": f"{image_title}\n\n{body}",
-        "status": "generated",
-    }
-    post_res = db.table("generated_posts").insert(record).execute()
-    return post_res.data[0]
+async def generate_manual_post_image(
+    user_image_base64: str,
+    custom_text: str,
+    font_style: FontStyle,
+) -> bytes:
+    """Manuel gönderi: kullanıcının görseli üzerine metin yaz, JPEG bytes döndür."""
+    background_source = base64.b64decode(user_image_base64)
+    body, bullets, cta = _prepare_custom_text(custom_text) if custom_text.strip() else ("", [], "")
+    return render_post_image(background_source, "", body, bullets, cta, font_style)

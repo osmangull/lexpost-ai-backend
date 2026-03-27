@@ -1,7 +1,15 @@
-from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
-from app.db.models import FontStyle, PostStatus
+from app.db.models import FontStyle
+
+
+class GeneratePostRequest(BaseModel):
+    legal_update_id: str
+    template_id: Optional[str] = None
+    user_image_base64: Optional[str] = None
+    font_style: FontStyle = FontStyle.CLASSIC
+    user_id: str
+    custom_text: Optional[str] = None
 
 
 class ManualPostRequest(BaseModel):
@@ -9,33 +17,6 @@ class ManualPostRequest(BaseModel):
     custom_text: str = ""
     font_style: FontStyle = FontStyle.CLASSIC
     user_id: str
-
-
-class ManualPostResponse(BaseModel):
-    image_url: str
-
-
-class GeneratePostRequest(BaseModel):
-    legal_update_id: str
-    template_id: Optional[str] = None
-    user_image_base64: Optional[str] = None  # kullanıcının kendi görseli (base64 JPEG)
-    font_style: FontStyle = FontStyle.CLASSIC
-    user_id: str
-    custom_text: Optional[str] = None
-
-
-class GeneratedPostOut(BaseModel):
-    id: str
-    legal_update_id: str
-    template_id: Optional[str]
-    font_style: FontStyle
-    image_url: str
-    caption: str
-    status: PostStatus
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class TemplateOut(BaseModel):
