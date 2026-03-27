@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
 from app.db.supabase_client import get_supabase
 from app.schemas.gazette import LegalUpdateOut
@@ -58,22 +58,31 @@ async def trigger_scrape(target_date: Optional[date] = None):
 
 
 @router.post("/scrape-if-needed")
-async def scrape_if_needed():
+async def scrape_if_needed(background_tasks: BackgroundTasks):
     """
     Harici cron servisi (cron-job.org) tarafından çağrılır.
-    Bugün zaten veri varsa hiçbir şey yapmaz.
+    Hemen 200 döner, scraping arka planda çalışır (timeout sorunu olmaz).
     """
+    background_tasks.add_task(_scrape_if_needed_task)
+    return {"status": "accepted"}
+
+
+async def _scrape_if_needed_task():
     from datetime import timedelta
+    import logging
+    logger = logging.getLogger(__name__)
+
     db = get_supabase()
     today = date.today().isoformat()
 
     existing = db.table("legal_updates").select("id").eq("gazette_date", today).limit(1).execute()
     if existing.data:
-        return {"scraped": False, "message": "Already up to date."}
+        logger.info(f"scrape-if-needed: already up to date for {today}")
+        return
 
+    logger.info(f"scrape-if-needed: starting scrape for {today}")
     updates = await process_daily_gazette()
+    logger.info(f"scrape-if-needed: {len(updates)} records saved")
 
     cutoff = (date.today() - timedelta(days=5)).isoformat()
     db.table("legal_updates").delete().lt("gazette_date", cutoff).execute()
-
-    return {"scraped": True, "new_count": len(updates)}
