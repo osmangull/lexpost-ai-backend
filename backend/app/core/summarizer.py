@@ -354,9 +354,9 @@ def summarize_legal_text_sync(title: str, raw_content: str, document_type: str =
 
     body = _build_body(scored, title, document_type)
     if body is None:
-        # PDF'den anlamlı içerik çıkarılamadı — boş bırak, editörde başlık görünsün
-        logger.info(f"Özet üretilemedi (yetersiz içerik): '{title[:50]}'")
-        return ""
+        # PDF içeriği yetersiz — başlıktan kural tabanlı özet üret
+        logger.info(f"İçerik yetersiz, başlıktan özet üretiliyor: '{title[:50]}'")
+        return _title_to_summary(title, document_type)
 
     bullets = _build_bullets(articles, scored, effective_date, title, document_type)
     cta = _build_cta(document_type, institution)
@@ -385,28 +385,26 @@ async def summarize_legal_text(title: str, raw_content: str, document_type: str 
 
 async def _summarize_with_groq(title: str, raw_content: str, document_type: str, api_key: str) -> str:
     """Groq API ile Türkçe hukuki özet üret."""
+    import re as _re
     from groq import AsyncGroq
 
     content_preview = raw_content[:3000].strip()
 
-    prompt = f"""Aşağıdaki Türk Resmi Gazetesi {document_type} metnini avukatlar için özetle.
+    prompt = f"""Türk Resmi Gazetesi'nde yayımlanan aşağıdaki {document_type} belgesini avukatlar için kısaca özetle.
 
 Başlık: {title}
 
-İçerik:
+Belge içeriği:
 {content_preview}
 
-Yanıtını TAM OLARAK bu formatta ver, başka hiçbir şey ekleme:
-[Tek cümlelik ana özet. Ne hakkında olduğunu net açıkla.]
-• [Birinci önemli madde veya etki]
-• [İkinci önemli madde veya etki]
-⚖️ Avukatlar için not: [Bu belgeyle ilgili avukatların dikkat etmesi gereken pratik bilgi]
+Yanıtın tam olarak şu yapıda olsun — köşeli parantez, yıldız işareti veya başka işaret KULLANMA, sadece düz metin yaz:
 
-Kurallar:
-- Türkçe yaz
-- Gerçek içeriğe dayan, uydurma
-- Her bölüm tek cümle olsun
-- Emoji kullanma (⚖️ hariç)"""
+Tek cümlelik özet — belgenin ne hakkında olduğunu açık şekilde ifade et.
+• İlk önemli madde veya etki (tek cümle)
+• İkinci önemli madde veya etki (tek cümle)
+⚖️ Avukatlar için not: Avukatların bu belgeyle ilgili dikkat etmesi gereken pratik husus (tek cümle)
+
+Kurallar: Türkçe yaz. Gerçek içeriğe dayan. Köşeli parantez veya markdown kullanma."""
 
     client = AsyncGroq(api_key=api_key)
     response = await client.chat.completions.create(
@@ -417,6 +415,18 @@ Kurallar:
     )
 
     result = response.choices[0].message.content.strip()
+
+    # Kalan şablon kalıplarını temizle
+    result = _re.sub(r'\[.*?\]', '', result)          # [köşeli parantez içi]
+    result = _re.sub(r'\*\*.*?\*\*', '', result)       # **kalın**
+    result = _re.sub(r'\*([^*]+)\*', r'\1', result)    # *italik*
+    result = _re.sub(r'^\s*#+\s*', '', result, flags=_re.MULTILINE)  # ## başlık
+    result = _re.sub(r'\n{3,}', '\n\n', result)
+    result = result.strip()
+
+    if not result:
+        return ""
+
     logger.info(f"Groq özet üretildi: '{title[:50]}'")
     return result
 
