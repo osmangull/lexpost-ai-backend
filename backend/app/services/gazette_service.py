@@ -2,7 +2,7 @@ import logging
 from datetime import date
 from typing import Optional
 
-from app.core.scraper import fetch_gazette_index, extract_pdf_text
+from app.core.scraper import fetch_gazette_index, extract_pdf_text, extract_html_text
 from app.core.summarizer import summarize_legal_text
 from app.db.supabase_client import get_supabase
 
@@ -30,10 +30,13 @@ async def process_daily_gazette(target_date: Optional[date] = None) -> list[dict
             logger.debug(f"Skipping duplicate: {update.title[:60]}")
             continue
 
-        # Extract PDF content if URL ends in .pdf
+        # Belge içeriğini çek: PDF → PyMuPDF, HTM/HTML → BeautifulSoup
         raw_content = update.raw_content
-        if update.source_url.lower().endswith(".pdf"):
+        url_lower = update.source_url.lower()
+        if url_lower.endswith(".pdf"):
             raw_content = await extract_pdf_text(update.source_url)
+        elif url_lower.endswith((".htm", ".html")):
+            raw_content = await extract_html_text(update.source_url)
 
         # Hibrit özetleme (kural tabanlı + TF-IDF)
         ai_summary = None
