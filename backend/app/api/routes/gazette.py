@@ -24,15 +24,6 @@ async def list_updates(
     return result.data
 
 
-@router.get("/{update_id}", response_model=LegalUpdateOut)
-async def get_update(update_id: str):
-    db = get_supabase()
-    result = db.table("legal_updates").select("*").eq("id", update_id).single().execute()
-    if not result.data:
-        raise HTTPException(status_code=404, detail="Legal update not found")
-    return result.data
-
-
 @router.get("/today-count")
 async def today_count():
     """
@@ -48,6 +39,15 @@ async def today_count():
         .execute()
     )
     return {"date": today, "count": result.count or 0}
+
+
+@router.get("/{update_id}", response_model=LegalUpdateOut)
+async def get_update(update_id: str):
+    db = get_supabase()
+    result = db.table("legal_updates").select("*").eq("id", update_id).single().execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Legal update not found")
+    return result.data
 
 
 @router.post("/scrape")
