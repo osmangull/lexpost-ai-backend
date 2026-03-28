@@ -76,10 +76,13 @@ async def fetch_gazette_index(target_date: Optional[date] = None) -> list[LegalU
         #   <div class="fihrist-item"><a href="...eskiler...">Başlık</a></div>
         # html-subtitle'dan bölüm tipini alıp altındaki fihrist-item'lara uyguluyoruz.
 
+        # Büyük harf kullanıyoruz — Python'un .lower() metodu Turkish İ (U+0130) karakterini
+        # 'i' + combining dot (2 karakter) olarak çevirdiği için substring match bozuluyor.
+        # Resmi Gazete bölüm başlıkları zaten ALL CAPS olduğundan doğrudan karşılaştırıyoruz.
         SECTION_TYPE_MAP = {
-            "yönetmelik": DocumentType.YONETMELIK,
-            "tebliğ": DocumentType.TEBLIG,
-            "karar": DocumentType.KARAR,
+            "YÖNETMELİK": DocumentType.YONETMELIK,
+            "TEBLİĞ": DocumentType.TEBLIG,
+            "KARAR": DocumentType.KARAR,
         }
 
         html_content = soup.find(id="html-content") or soup
@@ -90,7 +93,7 @@ async def fetch_gazette_index(target_date: Optional[date] = None) -> list[LegalU
 
             # Bölüm başlığı — tipi güncelle
             if "html-subtitle" in cls:
-                text = div.get_text(strip=True).lower()
+                text = div.get_text(strip=True)  # lowercase yapma — Turkish İ bug'ı
                 for keyword, doc_type in SECTION_TYPE_MAP.items():
                     if keyword in text:
                         current_section_type = doc_type
