@@ -71,40 +71,50 @@ async def fetch_gazette_index(target_date: Optional[date] = None) -> list[LegalU
         soup = BeautifulSoup(response.text, "lxml")
         gazette_number = _extract_gazette_number(soup)
 
-        # Bölüm başlıklarını takip ederek her linke doğru tipi ata.
-        # Resmi Gazete fihrist sayfası: bölüm başlıkları (YÖNETMELİKLER, TEBLİĞLER vb.)
-        # altında belgeler listelenir. Belge başlığında tür belirtilmeyebilir.
+        # Resmi Gazete fihrist sayfası yapısı:
+        #   <div class="html-subtitle"> YÖNETMELİKLER </div>
+        #   <div class="fihrist-item"><a href="...eskiler...">Başlık</a></div>
+        # html-subtitle'dan bölüm tipini alıp altındaki fihrist-item'lara uyguluyoruz.
+
         SECTION_TYPE_MAP = {
             "yönetmelik": DocumentType.YONETMELIK,
             "tebliğ": DocumentType.TEBLIG,
             "karar": DocumentType.KARAR,
-            "tarife": DocumentType.TEBLIG,  # Tarifeler genellikle Tebliğ kapsamında
         }
 
+        html_content = soup.find(id="html-content") or soup
         current_section_type: Optional[DocumentType] = None
 
-        for tag in soup.find_all(["h1", "h2", "h3", "h4", "strong", "b", "a"], href=True if False else None):
-            # Bölüm başlığı mı kontrol et
-            if tag.name in ("h1", "h2", "h3", "h4", "strong", "b"):
-                text = tag.get_text(strip=True).lower()
+        for div in html_content.find_all("div"):
+            cls = " ".join(div.get("class", []))
+
+            # Bölüm başlığı — tipi güncelle
+            if "html-subtitle" in cls:
+                text = div.get_text(strip=True).lower()
                 for keyword, doc_type in SECTION_TYPE_MAP.items():
                     if keyword in text:
                         current_section_type = doc_type
                         break
+                else:
+                    current_section_type = None
                 continue
 
-            # Link tag
-            if tag.name != "a":
-                continue
-            href = tag.get("href", "")
-            if "eskiler" not in href:
+            # Belge satırı
+            if "fihrist-item" not in cls:
                 continue
 
-            title = tag.get_text(strip=True).lstrip("–- ").strip()
+            link = div.find("a", href=True)
+            if not link:
+                continue
+            href = link["href"]
+            if "eskiler" not in href or "ilanlar" in href:
+                continue
+
+            title = link.get_text(strip=True).lstrip("–- ").strip()
             if not title or len(title) < 10:
                 continue
 
-            # Önce başlıktan tipi bulmaya çalış, yoksa bölüm tipini kullan
+            # Başlıktan tip bul, yoksa bölüm tipini kullan
             doc_type = _detect_document_type(title) or current_section_type
             if not doc_type:
                 continue
