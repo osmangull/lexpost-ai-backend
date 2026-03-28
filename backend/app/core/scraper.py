@@ -71,21 +71,41 @@ async def fetch_gazette_index(target_date: Optional[date] = None) -> list[LegalU
         soup = BeautifulSoup(response.text, "lxml")
         gazette_number = _extract_gazette_number(soup)
 
-        # fihrist sayfasında her madde bir <a> linki olarak listelenir
-        for link_tag in soup.find_all("a", href=True):
-            href = link_tag["href"]
-            # Sadece eskiler/ altındaki belge linkleri
+        # Bölüm başlıklarını takip ederek her linke doğru tipi ata.
+        # Resmi Gazete fihrist sayfası: bölüm başlıkları (YÖNETMELİKLER, TEBLİĞLER vb.)
+        # altında belgeler listelenir. Belge başlığında tür belirtilmeyebilir.
+        SECTION_TYPE_MAP = {
+            "yönetmelik": DocumentType.YONETMELIK,
+            "tebliğ": DocumentType.TEBLIG,
+            "karar": DocumentType.KARAR,
+            "tarife": DocumentType.TEBLIG,  # Tarifeler genellikle Tebliğ kapsamında
+        }
+
+        current_section_type: Optional[DocumentType] = None
+
+        for tag in soup.find_all(["h1", "h2", "h3", "h4", "strong", "b", "a"], href=True if False else None):
+            # Bölüm başlığı mı kontrol et
+            if tag.name in ("h1", "h2", "h3", "h4", "strong", "b"):
+                text = tag.get_text(strip=True).lower()
+                for keyword, doc_type in SECTION_TYPE_MAP.items():
+                    if keyword in text:
+                        current_section_type = doc_type
+                        break
+                continue
+
+            # Link tag
+            if tag.name != "a":
+                continue
+            href = tag.get("href", "")
             if "eskiler" not in href:
                 continue
 
-            title = link_tag.get_text(strip=True)
-            # "–– " öneki ile gelen alt maddeleri temizle
-            title = title.lstrip("–- ").strip()
-
+            title = tag.get_text(strip=True).lstrip("–- ").strip()
             if not title or len(title) < 10:
                 continue
 
-            doc_type = _detect_document_type(title)
+            # Önce başlıktan tipi bulmaya çalış, yoksa bölüm tipini kullan
+            doc_type = _detect_document_type(title) or current_section_type
             if not doc_type:
                 continue
 
