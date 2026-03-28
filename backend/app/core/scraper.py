@@ -214,16 +214,16 @@ async def extract_html_text(html_url: str) -> Optional[str]:
         try:
             response = await client.get(html_url)
             response.raise_for_status()
-            response.encoding = "utf-8"
         except (httpx.HTTPStatusError, httpx.RequestError) as e:
             logger.error(f"Failed to download HTML {html_url}: {e}")
             return None
 
     try:
-        soup = BeautifulSoup(response.text, "lxml")
-        # Resmi Gazete belge sayfasında metin genellikle #html-content veya body içinde
+        # response.content (bytes) geçiyoruz — BeautifulSoup HTML meta'dan encoding'i
+        # otomatik algılar. response.text + encoding="utf-8" zorlamak ISO-8859-9/Win-1254
+        # sayfalarında Türkçe karakterleri bozuyordu.
+        soup = BeautifulSoup(response.content, "lxml")
         content_div = soup.find(id="html-content") or soup.find("body") or soup
-        # Script ve style taglarını kaldır
         for tag in content_div.find_all(["script", "style", "nav", "header", "footer"]):
             tag.decompose()
         text = content_div.get_text(separator="\n")
