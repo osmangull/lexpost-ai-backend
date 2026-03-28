@@ -45,7 +45,9 @@ async def _run_idempotent_scrape():
     from app.services.gazette_service import process_daily_gazette
     from app.db.supabase_client import get_supabase
 
-    today = date.today().isoformat()
+    import pytz
+    from datetime import datetime
+    today = datetime.now(pytz.timezone("Europe/Istanbul")).date().isoformat()
     db = get_supabase()
     existing = db.table("legal_updates").select("id").eq("gazette_date", today).limit(1).execute()
     if existing.data:

@@ -47,9 +47,16 @@ def _detect_document_type(title: str) -> Optional[DocumentType]:
     return None
 
 
+def _today_trt() -> date:
+    """Render UTC saatini TRT (UTC+3) tarihine çevirir."""
+    import pytz
+    from datetime import datetime
+    return datetime.now(pytz.timezone("Europe/Istanbul")).date()
+
+
 async def fetch_gazette_index(target_date: Optional[date] = None) -> list[LegalUpdateCreate]:
     """Fetch and parse the Official Gazette fihrist page for a given date."""
-    target_date = target_date or date.today()
+    target_date = target_date or _today_trt()
     date_str = target_date.strftime("%Y-%m-%d")
     url = f"{settings.gazette_base_url}/fihrist?tarih={date_str}"
 

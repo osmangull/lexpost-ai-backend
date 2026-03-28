@@ -1,5 +1,9 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Optional
+import pytz
+
+def _today_trt() -> str:
+    return datetime.now(pytz.timezone("Europe/Istanbul")).date().isoformat()
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
@@ -31,7 +35,7 @@ async def today_count():
     Pull-to-refresh'te gazeteyi scrape etmeden veri tazeliğini kontrol etmek için kullanılır.
     """
     db = get_supabase()
-    today = date.today().isoformat()
+    today = _today_trt()
     result = (
         db.table("legal_updates")
         .select("id", count="exact")
@@ -73,7 +77,7 @@ async def _scrape_if_needed_task():
     logger = logging.getLogger(__name__)
 
     db = get_supabase()
-    today = date.today().isoformat()
+    today = _today_trt()
 
     existing = db.table("legal_updates").select("id").eq("gazette_date", today).limit(1).execute()
     if existing.data:
@@ -84,5 +88,5 @@ async def _scrape_if_needed_task():
     updates = await process_daily_gazette()
     logger.info(f"scrape-if-needed: {len(updates)} records saved")
 
-    cutoff = (date.today() - timedelta(days=5)).isoformat()
+    cutoff = (datetime.now(pytz.timezone("Europe/Istanbul")).date() - timedelta(days=5)).isoformat()
     db.table("legal_updates").delete().lt("gazette_date", cutoff).execute()
