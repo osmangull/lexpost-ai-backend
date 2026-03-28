@@ -107,7 +107,12 @@ async def fetch_gazette_index(target_date: Optional[date] = None) -> list[LegalU
             if not link:
                 continue
             href = link["href"]
-            if "eskiler" not in href or "ilanlar" in href:
+            # İlan/duyuru linklerini atla; belge linkleri hem eskiler hem doğrudan PDF olabilir
+            skip_patterns = ("ilanlar", "duyuru", "javascript:", "mailto:", "#")
+            if any(p in href.lower() for p in skip_patterns):
+                continue
+            # Sadece resmigazete.gov.tr veya göreli linkler
+            if href.startswith("http") and "resmigazete.gov.tr" not in href:
                 continue
 
             title = link.get_text(strip=True).lstrip("–- ").strip()
