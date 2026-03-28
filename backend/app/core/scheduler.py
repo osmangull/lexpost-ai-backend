@@ -1,8 +1,8 @@
 """
 APScheduler: Gazette scraping schedule (TRT = UTC+3)
 - 00:10 : scrape + 5-day cleanup
-- 03:00, 06:00, 09:00, 12:00 : idempotent scrape (skip if today already fetched)
-Gazette typically publishes midnight–08:00 TRT; delays covered by retry schedule.
+- 01:00/02:00/03:00/06:00/09:00 : erken sabah retry
+- 11:00/14:00/17:00 : gün içi retry (gazete bazen 09:00'dan sonra yayınlanır)
 """
 
 import logging
@@ -67,8 +67,11 @@ async def start_scheduler():
     _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=3,  minute=0),  id="gazette_retry_03", replace_existing=True)
     _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=6,  minute=0),  id="gazette_retry_06", replace_existing=True)
     _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=9,  minute=0),  id="gazette_retry_09", replace_existing=True)
+    _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=11, minute=0),  id="gazette_retry_11", replace_existing=True)
+    _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=14, minute=0),  id="gazette_retry_14", replace_existing=True)
+    _scheduler.add_job(_run_idempotent_scrape, CronTrigger(hour=17, minute=0),  id="gazette_retry_17", replace_existing=True)
     _scheduler.start()
-    logger.info("Scheduler started: nightly at 00:10, retries at 01:00/02:00/03:00/06:00/09:00 TRT")
+    logger.info("Scheduler started: nightly 00:10, retries 01/02/03/06/09/11/14/17 TRT")
 
 
 async def stop_scheduler():
