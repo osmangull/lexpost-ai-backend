@@ -122,7 +122,9 @@ async def generate_post_image(
     image_title = custom_title or update.get("title", "Hukuki Güncelleme")
     badge = custom_category or update.get("document_type", "HUKUK GÜNCELLEMESİ")
 
-    if custom_text and custom_text.strip():
+    # custom_text None ise (eski akış): AI özetini kullan
+    # custom_text string ise (editörden geldi): boş da olsa editör içeriğini kullan
+    if custom_text is not None:
         body, bullets, cta = _prepare_custom_text(custom_text)
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
