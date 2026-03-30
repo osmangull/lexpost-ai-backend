@@ -3,6 +3,7 @@ import logging
 import re
 import unicodedata
 from pathlib import Path
+from typing import Optional
 
 from app.config import get_settings
 from app.core.image_engine import render_post_image
@@ -74,12 +75,27 @@ def _parse_summary_parts(ai_summary: str) -> tuple[str, list[str], str]:
     return body, bullets[:2], cta
 
 
+def _hex_to_rgb(hex_str: Optional[str], default: tuple) -> tuple:
+    if not hex_str:
+        return default
+    try:
+        h = hex_str.lstrip("#")
+        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+    except Exception:
+        return default
+
+
 async def generate_post_image(
     legal_update_id: str,
     font_style: FontStyle,
     template_id: str = None,
     custom_text: str = None,
     user_image_base64: str = None,
+    custom_category: str = None,
+    custom_title: str = None,
+    text_color_hex: str = None,
+    accent_color_hex: str = None,
+    font_size_delta: int = 0,
 ) -> bytes:
     """Görsel oluştur ve JPEG bytes döndür. DB/Storage kaydı yapılmaz."""
     db = get_supabase()
@@ -102,22 +118,43 @@ async def generate_post_image(
         background_source = str(Path(settings.backgrounds_dir) / template["background_filename"])
 
     ai_summary = update.get("ai_summary") or ""
-    image_title = update.get("title", "Hukuki Güncelleme")
+    image_title = custom_title or update.get("title", "Hukuki Güncelleme")
+    badge = custom_category or update.get("document_type", "HUKUK GÜNCELLEMESİ")
 
     if custom_text and custom_text.strip():
         body, bullets, cta = _prepare_custom_text(custom_text)
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
 
-    return render_post_image(background_source, image_title, body, bullets, cta, font_style)
+    txt_color = _hex_to_rgb(text_color_hex, (255, 255, 255))
+    acc_color = _hex_to_rgb(accent_color_hex, (212, 175, 55))
+
+    return render_post_image(
+        background_source, image_title, body, bullets, cta, font_style,
+        badge_text=badge, text_color=txt_color, accent_color=acc_color,
+        font_size_delta=font_size_delta,
+    )
 
 
 async def generate_manual_post_image(
     user_image_base64: str,
     custom_text: str,
     font_style: FontStyle,
+    custom_category: str = None,
+    custom_title: str = None,
+    text_color_hex: str = None,
+    accent_color_hex: str = None,
+    font_size_delta: int = 0,
 ) -> bytes:
     """Manuel gönderi: kullanıcının görseli üzerine metin yaz, JPEG bytes döndür."""
     background_source = base64.b64decode(user_image_base64)
     body, bullets, cta = _prepare_custom_text(custom_text) if custom_text.strip() else ("", [], "")
-    return render_post_image(background_source, "", body, bullets, cta, font_style)
+    badge = custom_category or ""
+    title = custom_title or ""
+    txt_color = _hex_to_rgb(text_color_hex, (255, 255, 255))
+    acc_color = _hex_to_rgb(accent_color_hex, (212, 175, 55))
+    return render_post_image(
+        background_source, title, body, bullets, cta, font_style,
+        badge_text=badge, text_color=txt_color, accent_color=acc_color,
+        font_size_delta=font_size_delta,
+    )

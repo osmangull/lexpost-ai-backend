@@ -92,6 +92,10 @@ def render_post_image(
     bullets: list[str],
     cta: str,
     font_style: FontStyle = FontStyle.CLASSIC,
+    badge_text: str = "HUKUK GÜNCELLEMESİ",
+    text_color: tuple = (255, 255, 255),
+    accent_color: tuple = (212, 175, 55),
+    font_size_delta: int = 0,
 ) -> bytes:
     """
     Render a 1080x1080 post image and return as JPEG bytes.
@@ -103,6 +107,10 @@ def render_post_image(
         bullets: List of exactly 2 bullet point strings
         cta: Call-to-action text (bottom)
         font_style: Classic (Playfair) or Modern (Montserrat)
+        badge_text: Üst badge metni (ör. kategori)
+        text_color: RGB tuple for main text
+        accent_color: RGB tuple for lines/bullets/badge
+        font_size_delta: Font boyutu ayarı (-4, 0, +6)
     """
     # Load and resize background
     if isinstance(background_source, bytes):
@@ -116,23 +124,24 @@ def render_post_image(
 
     draw = ImageDraw.Draw(image)
 
-    font_title = _get_font(font_style, "title", FONT_SIZES["title"])
-    font_body = _get_font(font_style, "body", FONT_SIZES["body"])
-    font_bullet = _get_font(font_style, "body", FONT_SIZES["bullet"])
-    font_cta = _get_font(font_style, "body", FONT_SIZES["cta"])
+    d = font_size_delta
+    font_title  = _get_font(font_style, "title", FONT_SIZES["title"]  + d)
+    font_body   = _get_font(font_style, "body",  FONT_SIZES["body"]   + d)
+    font_bullet = _get_font(font_style, "body",  FONT_SIZES["bullet"] + d)
+    font_cta    = _get_font(font_style, "body",  FONT_SIZES["cta"]    + d)
+
+    body_color_use   = text_color
+    bullet_color_use = tuple(max(0, c - 30) for c in text_color)
 
     y_cursor = PADDING + 30
 
-    # --- Üst şerit: "HUKUK GÜNCELLEMESİ" badge ---
-    badge_font = _get_font(font_style, "body", FONT_SIZES["badge"])
-    badge_text = "HUKUK GÜNCELLEMESİ"
-    draw.text((PADDING, y_cursor), badge_text, font=badge_font, fill=ACCENT_COLOR)
-    y_cursor += FONT_SIZES["badge"] + 16
+    # --- Üst şerit: badge ---
+    badge_font = _get_font(font_style, "body", FONT_SIZES["badge"] + d)
+    draw.text((PADDING, y_cursor), badge_text.upper(), font=badge_font, fill=accent_color)
+    y_cursor += FONT_SIZES["badge"] + d + 16
 
     # --- Title ---
-    # Başlık kaç satır gerektiriyorsa o kadar göster; font gerektiğinde küçültülür
-    # Hedef: başlığın tamamı görselde görünsün
-    _title_sizes = [48, 42, 38, 34, 30]
+    _title_sizes = [48 + d, 42 + d, 38 + d, 34 + d, 30 + d]
     title_font = font_title
     title_lines = _wrap_text(title, title_font, TEXT_AREA_WIDTH, draw)
     for _sz in _title_sizes[1:]:
@@ -142,17 +151,16 @@ def render_post_image(
         else:
             break
     title_size = title_font.size
-    for line in title_lines:          # satır sınırı yok — tüm satırlar çizilir
-        draw.text((PADDING, y_cursor), line, font=title_font, fill=TEXT_COLOR)
+    for line in title_lines:
+        draw.text((PADDING, y_cursor), line, font=title_font, fill=text_color)
         y_cursor += title_size + 6
 
-    # Altın çizgi
+    # Vurgu çizgisi
     y_cursor += 10
-    draw.rectangle([(PADDING, y_cursor), (PADDING + 160, y_cursor + 3)], fill=ACCENT_COLOR)
+    draw.rectangle([(PADDING, y_cursor), (PADDING + 160, y_cursor + 3)], fill=accent_color)
     y_cursor += 24
 
     # --- Body ---
-    # • ile başlayan satırlar inline bullet olarak, diğerleri normal paragraf olarak çizilir.
     if summary_body and summary_body.strip():
         paragraphs = [p.strip() for p in summary_body.split("\n") if p.strip()]
         rendered = 0
@@ -160,44 +168,44 @@ def render_post_image(
             if rendered >= 10:
                 break
             is_bullet = para.startswith("•")
-            text = para.lstrip("• ").strip() if is_bullet else para
+            text_para = para.lstrip("• ").strip() if is_bullet else para
             font_para = font_bullet if is_bullet else font_body
-            size_para = FONT_SIZES["bullet"] if is_bullet else FONT_SIZES["body"]
+            size_para = FONT_SIZES["bullet"] + d if is_bullet else FONT_SIZES["body"] + d
             indent = 28 if is_bullet else 0
             max_w = TEXT_AREA_WIDTH - indent
 
             if is_bullet:
-                draw.text((PADDING, y_cursor), "-", font=font_bullet, fill=ACCENT_COLOR)
+                draw.text((PADDING, y_cursor), "-", font=font_bullet, fill=accent_color)
 
-            wrapped = _wrap_text(text, font_para, max_w, draw)
+            wrapped = _wrap_text(text_para, font_para, max_w, draw)
             for line in wrapped:
                 if rendered >= 10:
                     break
                 draw.text((PADDING + indent, y_cursor), line, font=font_para,
-                          fill=BULLET_TEXT_COLOR if is_bullet else BODY_COLOR)
+                          fill=bullet_color_use if is_bullet else body_color_use)
                 y_cursor += size_para + 5
                 rendered += 1
             y_cursor += 4
         y_cursor += 10
 
-    # --- Bullets (ai_summary'den parse edilenler — custom_text'te boş gelir) ---
+    # --- Bullets ---
     for bullet in bullets[:2]:
         if not bullet.strip():
             continue
-        draw.text((PADDING, y_cursor), "-", font=font_bullet, fill=ACCENT_COLOR)
+        draw.text((PADDING, y_cursor), "-", font=font_bullet, fill=accent_color)
         bullet_lines = _wrap_text(bullet, font_bullet, TEXT_AREA_WIDTH - 20, draw)
         for line in bullet_lines:
-            draw.text((PADDING + 20, y_cursor), line, font=font_bullet, fill=BULLET_TEXT_COLOR)
-            y_cursor += FONT_SIZES["bullet"] + 4
+            draw.text((PADDING + 20, y_cursor), line, font=font_bullet, fill=bullet_color_use)
+            y_cursor += FONT_SIZES["bullet"] + d + 4
         y_cursor += 8
 
-    # --- Alt bölüm: ince çizgi + CTA + branding ---
+    # --- Alt bölüm ---
     bottom_y = CANVAS_SIZE[1] - PADDING - 60
-    draw.line([(PADDING, bottom_y), (CANVAS_SIZE[0] - PADDING, bottom_y)], fill=(255, 255, 255, 60), width=1)
+    draw.line([(PADDING, bottom_y), (CANVAS_SIZE[0] - PADDING, bottom_y)], fill=(*accent_color, 120), width=1)
 
     # CTA
     cta_short = cta[:70] + "…" if len(cta) > 70 else cta
-    draw.text((PADDING, bottom_y + 12), cta_short, font=font_cta, fill=ACCENT_COLOR)
+    draw.text((PADDING, bottom_y + 12), cta_short, font=font_cta, fill=accent_color)
 
     # Branding sağ alt
     watermark_font = _get_font(font_style, "body", 20)

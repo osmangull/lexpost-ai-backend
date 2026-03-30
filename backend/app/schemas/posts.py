@@ -10,13 +10,23 @@ class GeneratePostRequest(BaseModel):
     font_style: FontStyle = FontStyle.CLASSIC
     user_id: str
     custom_text: Optional[str] = None
+    custom_category: Optional[str] = None   # badge alanı (ör. "Yönetmelik")
+    custom_title: Optional[str] = None      # başlık alanı
+    text_color: Optional[str] = None        # hex renk ör. "#FFFFFF"
+    accent_color: Optional[str] = None      # hex renk ör. "#D4AF37"
+    font_size_delta: int = 0                # -4 küçük, 0 orta, +6 büyük
 
 
 class ManualPostRequest(BaseModel):
     user_image_base64: str
     custom_text: str = ""
+    custom_category: Optional[str] = None
+    custom_title: Optional[str] = None
     font_style: FontStyle = FontStyle.CLASSIC
     user_id: str
+    text_color: Optional[str] = None
+    accent_color: Optional[str] = None
+    font_size_delta: int = 0
 
 
 class TemplateOut(BaseModel):

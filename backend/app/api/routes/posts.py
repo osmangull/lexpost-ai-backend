@@ -16,6 +16,11 @@ async def generate_post(request: GeneratePostRequest):
             font_style=request.font_style,
             custom_text=request.custom_text,
             user_image_base64=request.user_image_base64,
+            custom_category=request.custom_category,
+            custom_title=request.custom_title,
+            text_color_hex=request.text_color,
+            accent_color_hex=request.accent_color,
+            font_size_delta=request.font_size_delta,
         )
         return Response(content=image_bytes, media_type="image/jpeg")
     except ValueError as e:
@@ -31,6 +36,11 @@ async def generate_manual(request: ManualPostRequest):
             user_image_base64=request.user_image_base64,
             custom_text=request.custom_text,
             font_style=request.font_style,
+            custom_category=request.custom_category,
+            custom_title=request.custom_title,
+            text_color_hex=request.text_color,
+            accent_color_hex=request.accent_color,
+            font_size_delta=request.font_size_delta,
         )
         return Response(content=image_bytes, media_type="image/jpeg")
     except Exception as e:
