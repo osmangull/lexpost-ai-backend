@@ -156,9 +156,9 @@ def render_post_image(
         y_cursor += title_size + 6
 
     # Vurgu çizgisi
-    y_cursor += 10
-    draw.rectangle([(PADDING, y_cursor), (PADDING + 160, y_cursor + 3)], fill=accent_color)
-    y_cursor += 24
+    y_cursor += 14
+    draw.rectangle([(PADDING, y_cursor), (PADDING + 260, y_cursor + 3)], fill=accent_color)
+    y_cursor += 32
 
     # --- Body ---
     if summary_body and summary_body.strip():
