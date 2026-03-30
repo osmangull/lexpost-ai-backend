@@ -93,6 +93,7 @@ async def generate_post_image(
     user_image_base64: str = None,
     custom_category: str = None,
     custom_title: str = None,
+    custom_cta: str = None,
     text_color_hex: str = None,
     accent_color_hex: str = None,
     font_size_delta: int = 0,
@@ -126,6 +127,9 @@ async def generate_post_image(
     else:
         body, bullets, cta = _parse_summary_parts(ai_summary)
 
+    if custom_cta and custom_cta.strip():
+        cta = custom_cta.strip()
+
     txt_color = _hex_to_rgb(text_color_hex, (255, 255, 255))
     acc_color = _hex_to_rgb(accent_color_hex, (212, 175, 55))
 
@@ -142,6 +146,7 @@ async def generate_manual_post_image(
     font_style: FontStyle,
     custom_category: str = None,
     custom_title: str = None,
+    custom_cta: str = None,
     text_color_hex: str = None,
     accent_color_hex: str = None,
     font_size_delta: int = 0,
@@ -149,6 +154,8 @@ async def generate_manual_post_image(
     """Manuel gönderi: kullanıcının görseli üzerine metin yaz, JPEG bytes döndür."""
     background_source = base64.b64decode(user_image_base64)
     body, bullets, cta = _prepare_custom_text(custom_text) if custom_text.strip() else ("", [], "")
+    if custom_cta and custom_cta.strip():
+        cta = custom_cta.strip()
     badge = custom_category or ""
     title = custom_title or ""
     txt_color = _hex_to_rgb(text_color_hex, (255, 255, 255))
