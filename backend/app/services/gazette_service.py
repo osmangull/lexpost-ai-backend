@@ -64,4 +64,12 @@ async def process_daily_gazette(target_date: Optional[date] = None) -> list[dict
             logger.info(f"Persisted: {update.title[:60]}")
 
     logger.info(f"Pipeline complete: {len(results)} new updates saved.")
+
+    if results:
+        try:
+            from app.services.notification_service import send_gazette_notifications
+            await send_gazette_notifications(len(results))
+        except Exception as e:
+            logger.error(f"Notification dispatch failed: {e}")
+
     return results
