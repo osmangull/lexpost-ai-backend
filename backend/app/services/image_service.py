@@ -86,7 +86,7 @@ def _hex_to_rgb(hex_str: Optional[str], default: tuple) -> tuple:
 
 
 async def generate_post_image(
-    legal_update_id: str,
+    legal_update_id: Optional[str],
     font_style: FontStyle,
     template_id: str = None,
     custom_text: str = None,
@@ -104,11 +104,7 @@ async def generate_post_image(
     if not template_id and not user_image_base64:
         raise ValueError("template_id or user_image_base64 must be provided")
 
-    update_res = db.table("legal_updates").select("*").eq("id", legal_update_id).single().execute()
-    update = update_res.data
-    if not update:
-        raise ValueError(f"Legal update {legal_update_id} not found")
-
+    # Arka plan kaynağını belirle
     if user_image_base64:
         background_source = base64.b64decode(user_image_base64)
     else:
@@ -118,16 +114,23 @@ async def generate_post_image(
             raise ValueError(f"Template {template_id} not found")
         background_source = str(Path(settings.backgrounds_dir) / template["background_filename"])
 
-    ai_summary = update.get("ai_summary") or ""
-    image_title = custom_title or update.get("title", "Hukuki Güncelleme")
-    badge = custom_category or update.get("document_type", "HUKUK GÜNCELLEMESİ")
-
-    # custom_text None ise (eski akış): AI özetini kullan
-    # custom_text string ise (editörden geldi): boş da olsa editör içeriğini kullan
-    if custom_text is not None:
-        body, bullets, cta = _prepare_custom_text(custom_text)
+    # legal_update_id varsa DB'den içerik çek, yoksa sadece custom değerleri kullan
+    if legal_update_id:
+        update_res = db.table("legal_updates").select("*").eq("id", legal_update_id).single().execute()
+        update = update_res.data
+        if not update:
+            raise ValueError(f"Legal update {legal_update_id} not found")
+        ai_summary = update.get("ai_summary") or ""
+        image_title = custom_title or update.get("title", "Hukuki Güncelleme")
+        badge = custom_category or update.get("document_type", "HUKUK GÜNCELLEMESİ")
+        if custom_text is not None:
+            body, bullets, cta = _prepare_custom_text(custom_text)
+        else:
+            body, bullets, cta = _parse_summary_parts(ai_summary)
     else:
-        body, bullets, cta = _parse_summary_parts(ai_summary)
+        image_title = custom_title or ""
+        badge = custom_category or ""
+        body, bullets, cta = _prepare_custom_text(custom_text or "")
 
     if custom_cta and custom_cta.strip():
         cta = custom_cta.strip()

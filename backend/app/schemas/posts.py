@@ -4,7 +4,7 @@ from app.db.models import FontStyle
 
 
 class GeneratePostRequest(BaseModel):
-    legal_update_id: str
+    legal_update_id: Optional[str] = None
     template_id: Optional[str] = None
     user_image_base64: Optional[str] = None
     font_style: FontStyle = FontStyle.CLASSIC
