@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     fonts_dir: str = "assets/fonts"
     backgrounds_dir: str = "assets/backgrounds"
 
+    # Premium
+    promo_code: str = "LEXPOST2024"
+    monthly_price: str = "₺149"
+    yearly_price: str = "₺999"
+    yearly_savings: str = "%44 tasarruf"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

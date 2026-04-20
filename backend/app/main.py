@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.api.routes import gazette, notifications, posts, templates
+from app.api.routes import config, gazette, notifications, posts, templates
 from app.core.scheduler import start_scheduler, stop_scheduler
 
 logging.basicConfig(
@@ -40,6 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(config.router, prefix="/api/v1/config", tags=["Config"])
 app.include_router(gazette.router, prefix="/api/v1/gazette", tags=["Gazette"])
 app.include_router(posts.router, prefix="/api/v1/posts", tags=["Posts"])
 app.include_router(templates.router, prefix="/api/v1/templates", tags=["Templates"])
