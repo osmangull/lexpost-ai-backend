@@ -24,4 +24,6 @@ async def get_pricing():
         "monthly_price": settings.monthly_price,
         "yearly_price": settings.yearly_price,
         "yearly_savings": settings.yearly_savings,
+        "notification_title": settings.notification_title,
+        "notification_body": settings.notification_body,
     }

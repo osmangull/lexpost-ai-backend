@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     yearly_price: str = "₺999"
     yearly_savings: str = "%44 tasarruf"
 
+    # Bildirim
+    notification_title: str = "LexPost AI"
+    notification_body: str = "Günlük gazeten hazır, incelemek ister misin? 📰"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
