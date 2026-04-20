@@ -361,7 +361,7 @@ def summarize_legal_text_sync(title: str, raw_content: str, document_type: str =
     bullets = _build_bullets(articles, scored, effective_date, title, document_type)
     cta = _build_cta(document_type, institution)
 
-    summary = f"{body}\n• {bullets[0]}\n• {bullets[1]}\n⚖️ Avukatlar için not: {cta}"
+    summary = f"{body}\n• {bullets[0]}\n• {bullets[1]}\n⚖️ Not: {cta}"
 
     logger.info(f"Özet üretildi: '{title[:50]}' ({len(summary.split())} kelime)")
     return summary
@@ -402,7 +402,7 @@ Yanıtın tam olarak şu yapıda olsun — köşeli parantez, yıldız işareti 
 Tek cümlelik özet — belgenin ne hakkında olduğunu açık şekilde ifade et.
 • İlk önemli madde veya etki (tek cümle)
 • İkinci önemli madde veya etki (tek cümle)
-⚖️ Avukatlar için not: Avukatların bu belgeyle ilgili dikkat etmesi gereken pratik husus (tek cümle)
+⚖️ Not: Bu belgeyle ilgili dikkat edilmesi gereken pratik husus (tek cümle)
 
 Kurallar: Türkçe yaz. Gerçek içeriğe dayan. Köşeli parantez veya markdown kullanma."""
 
