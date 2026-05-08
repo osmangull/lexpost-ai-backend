@@ -96,9 +96,9 @@ struct ManualPostEditorView: View {
                             }
                             .padding(.horizontal)
                         }
-                        .onChange(of: selectedItem) { item in
+                        .onChange(of: selectedItem) {
                             Task {
-                                if let data = try? await item?.loadTransferable(type: Data.self),
+                                if let data = try? await selectedItem?.loadTransferable(type: Data.self),
                                    let img = UIImage(data: data) {
                                     selectedImage = img
                                     selectedStoredImageId = nil
