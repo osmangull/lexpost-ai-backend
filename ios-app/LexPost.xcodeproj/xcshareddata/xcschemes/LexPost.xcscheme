@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AATARGET1"
-               BuildableName = "LexPostAI.app"
-               BlueprintName = "LexPostAI"
-               ReferencedContainer = "container:LexPostAI.xcodeproj">
+               BuildableName = "LexPost.app"
+               BlueprintName = "LexPost"
+               ReferencedContainer = "container:LexPost.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AATARGET1"
-            BuildableName = "LexPostAI.app"
-            BlueprintName = "LexPostAI"
-            ReferencedContainer = "container:LexPostAI.xcodeproj">
+            BuildableName = "LexPost.app"
+            BlueprintName = "LexPost"
+            ReferencedContainer = "container:LexPost.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "AATARGET1"
-            BuildableName = "LexPostAI.app"
-            BlueprintName = "LexPostAI"
-            ReferencedContainer = "container:LexPostAI.xcodeproj">
+            BuildableName = "LexPost.app"
+            BlueprintName = "LexPost"
+            ReferencedContainer = "container:LexPost.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -15,7 +15,7 @@ private let pages: [OnboardingPage] = [
     OnboardingPage(
         icon: "⚖️",
         isEmoji: true,
-        title: "LexPost AI",
+        title: "LexPost",
         body: "Türk hukuku için akıllı gazete takibi",
         accentPhrase: "akıllı gazete takibi"
     ),

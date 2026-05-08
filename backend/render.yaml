@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lexpost-ai-backend
+    name: lexpost-backend
     runtime: python
     region: frankfurt
     plan: free

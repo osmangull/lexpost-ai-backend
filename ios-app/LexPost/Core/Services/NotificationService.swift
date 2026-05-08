@@ -76,7 +76,7 @@ final class NotificationService {
 
     // Bildirim metnini locale sakla (son çekilen backend değeri)
     var savedNotificationTitle: String {
-        get { UserDefaults.standard.string(forKey: "lexpost_notif_title") ?? "LexPost AI" }
+        get { UserDefaults.standard.string(forKey: "lexpost_notif_title") ?? "LexPost" }
         set { UserDefaults.standard.set(newValue, forKey: "lexpost_notif_title") }
     }
     var savedNotificationBody: String {

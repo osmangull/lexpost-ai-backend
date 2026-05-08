@@ -22,7 +22,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 }
 
 @main
-struct LexPostAIApp: App {
+struct LexPostApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @AppStorage("isDarkMode") private var isDarkMode = true
 

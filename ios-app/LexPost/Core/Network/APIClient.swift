@@ -24,7 +24,7 @@ final class APIClient {
 
     private init() {
         self.baseURL = ProcessInfo.processInfo.environment["API_BASE_URL"]
-            ?? "https://lexpost-ai-backend.onrender.com/api/v1"
+            ?? "https://lexpost-backend.onrender.com/api/v1"
         self.session = URLSession.shared
     }
 

@@ -1,4 +1,4 @@
-app = "lexpost-ai-backend"
+app = "lexpost-backend"
 primary_region = "ams"
 
 [build]

@@ -19,10 +19,10 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting LexPost AI backend...")
+    logger.info("Starting LexPost backend...")
     await start_scheduler()
     yield
-    logger.info("Shutting down LexPost AI backend...")
+    logger.info("Shutting down LexPost backend...")
     await stop_scheduler()
 
 

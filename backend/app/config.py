@@ -4,7 +4,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     # App
-    app_name: str = "LexPost AI"
+    app_name: str = "LexPost"
     app_version: str = "1.0.0"
     debug: bool = False
 
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     yearly_savings: str = "%44 tasarruf"
 
     # Bildirim
-    notification_title: str = "LexPost AI"
+    notification_title: str = "LexPost"
     notification_body: str = "Günlük gazeten hazır, incelemek ister misin? 📰"
 
     class Config:

@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		2169F4042F88446C00955333 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2169F3FF2F88446C00955333 /* NotificationService.swift */; };
 		21B038302FA40D4200BE40DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21B0382F2FA40D4200BE40DA /* Assets.xcassets */; };
-		AA000001 /* LexPostAIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100001 /* LexPostAIApp.swift */; };
+		AA000001 /* LexPostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100001 /* LexPostApp.swift */; };
 		AA000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100002 /* ContentView.swift */; };
 		AA000003 /* LegalUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100003 /* LegalUpdate.swift */; };
 		AA000004 /* Template.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100004 /* Template.swift */; };
@@ -37,7 +37,7 @@
 		2169F3FD2F75E83D00955333 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		2169F3FF2F88446C00955333 /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		21B0382F2FA40D4200BE40DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AA100001 /* LexPostAIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexPostAIApp.swift; sourceTree = "<group>"; };
+		AA100001 /* LexPostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexPostApp.swift; sourceTree = "<group>"; };
 		AA100002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA100003 /* LegalUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalUpdate.swift; sourceTree = "<group>"; };
 		AA100004 /* Template.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Template.swift; sourceTree = "<group>"; };
@@ -59,7 +59,7 @@
 		AA100022 /* UpdateDetailViewNew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateDetailViewNew.swift; sourceTree = "<group>"; };
 		AA100023 /* PremiumService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumService.swift; sourceTree = "<group>"; };
 		AA100024 /* PremiumPaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumPaywallView.swift; sourceTree = "<group>"; };
-		AAAPP001 /* LexPostAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LexPostAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAAPP001 /* LexPost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LexPost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,12 +76,12 @@
 		AAGRP0000 = {
 			isa = PBXGroup;
 			children = (
-				AAGRP0001 /* LexPostAI */,
+				AAGRP0001 /* LexPost */,
 				AAGRP0099 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		AAGRP0001 /* LexPostAI */ = {
+		AAGRP0001 /* LexPost */ = {
 			isa = PBXGroup;
 			children = (
 				2169F3FD2F75E83D00955333 /* Info.plist */,
@@ -90,13 +90,13 @@
 				AAGRP0050 /* Features */,
 				21B0382F2FA40D4200BE40DA /* Assets.xcassets */,
 			);
-			path = LexPostAI;
+			path = LexPost;
 			sourceTree = "<group>";
 		};
 		AAGRP0010 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				AA100001 /* LexPostAIApp.swift */,
+				AA100001 /* LexPostApp.swift */,
 				AA100002 /* ContentView.swift */,
 				AA100020 /* OnboardingView.swift */,
 				AA100024 /* PremiumPaywallView.swift */,
@@ -236,7 +236,7 @@
 		AAGRP0099 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AAAPP001 /* LexPostAI.app */,
+				AAAPP001 /* LexPost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -244,9 +244,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AATARGET1 /* LexPostAI */ = {
+		AATARGET1 /* LexPost */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AACFG0001 /* Build configuration list for PBXNativeTarget "LexPostAI" */;
+			buildConfigurationList = AACFG0001 /* Build configuration list for PBXNativeTarget "LexPost" */;
 			buildPhases = (
 				AABUILD00 /* Sources */,
 				AABUILD01 /* Frameworks */,
@@ -256,9 +256,9 @@
 			);
 			dependencies = (
 			);
-			name = LexPostAI;
-			productName = LexPostAI;
-			productReference = AAAPP001 /* LexPostAI.app */;
+			name = LexPost;
+			productName = LexPost;
+			productReference = AAAPP001 /* LexPost.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -276,7 +276,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AACFG0000 /* Build configuration list for PBXProject "LexPostAI" */;
+			buildConfigurationList = AACFG0000 /* Build configuration list for PBXProject "LexPost" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = tr;
 			hasScannedForEncodings = 0;
@@ -290,7 +290,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AATARGET1 /* LexPostAI */,
+				AATARGET1 /* LexPost */,
 			);
 		};
 /* End PBXProject section */
@@ -311,7 +311,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA000001 /* LexPostAIApp.swift in Sources */,
+				AA000001 /* LexPostApp.swift in Sources */,
 				AA000002 /* ContentView.swift in Sources */,
 				AA000020 /* OnboardingView.swift in Sources */,
 				AA000021 /* DashboardViewNew.swift in Sources */,
@@ -409,7 +409,7 @@
 				DEVELOPMENT_TEAM = 59PNR2D9C2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LexPostAI/Info.plist;
+				INFOPLIST_FILE = LexPost/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSAppTransportSecurity = "<dict><key>NSAllowsArbitraryLoads</key><true/></dict>";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "LexPost, sosyal medya gönderilerinize görsel ekleyebilmeniz için fotoğraf galerinize erişim iznine ihtiyaç duyar.";
@@ -443,7 +443,7 @@
 				DEVELOPMENT_TEAM = 59PNR2D9C2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = LexPostAI/Info.plist;
+				INFOPLIST_FILE = LexPost/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSAppTransportSecurity = "<dict><key>NSAllowsArbitraryLoads</key><true/></dict>";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "LexPost, sosyal medya gönderilerinize görsel ekleyebilmeniz için fotoğraf galerinize erişim iznine ihtiyaç duyar.";
@@ -467,7 +467,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AACFG0000 /* Build configuration list for PBXProject "LexPostAI" */ = {
+		AACFG0000 /* Build configuration list for PBXProject "LexPost" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AACFG0010 /* Debug */,
@@ -476,7 +476,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AACFG0001 /* Build configuration list for PBXNativeTarget "LexPostAI" */ = {
+		AACFG0001 /* Build configuration list for PBXNativeTarget "LexPost" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AACFG0020 /* Debug */,

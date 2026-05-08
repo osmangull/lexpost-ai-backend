@@ -209,7 +209,7 @@ def render_post_image(
 
     # Branding sağ alt
     watermark_font = _get_font(font_style, "body", 20)
-    wm_text = "LexPost AI"
+    wm_text = "LexPost"
     wm_bbox = draw.textbbox((0, 0), wm_text, font=watermark_font)
     wm_w = wm_bbox[2] - wm_bbox[0]
     draw.text((CANVAS_SIZE[0] - PADDING - wm_w, bottom_y + 14), wm_text, font=watermark_font, fill=(160, 160, 160))
