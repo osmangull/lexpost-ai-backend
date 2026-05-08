@@ -108,7 +108,7 @@ struct ManualPostEditorView: View {
                         }
                     }
 
-                    // Kayıtlı görseller
+                    // Kayıtlı görsellers
                     if !userStore.images.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Kayıtlı Görsellerim")
