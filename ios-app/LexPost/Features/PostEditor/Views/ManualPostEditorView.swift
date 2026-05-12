@@ -141,7 +141,7 @@ struct ManualPostEditorView: View {
                                             }
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(selectedStoredImageId == img.id ? Color.accentColor : Color.clear, lineWidth: 2.5)
+                                                    .stroke(selectedStoredImageId == img.id ? appGold : Color.clear, lineWidth: 2.5)
                                             )
                                         }
                                         .buttonStyle(.plain)
@@ -263,7 +263,7 @@ struct ManualPostEditorView: View {
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(canGenerate ? Color.accentColor : Color.gray)
+                            .background(canGenerate ? appGold : Color.gray)
                             .foregroundColor(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                         }
@@ -372,7 +372,7 @@ struct ManualShareView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.accentColor)
+                        .background(appGold)
                         .foregroundColor(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }

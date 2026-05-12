@@ -104,7 +104,7 @@ struct PostEditorView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.accentColor)
+                        .background(appGold)
                         .foregroundColor(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
@@ -401,7 +401,7 @@ struct PostEditorView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.accentColor)
+                        .background(appGold)
                         .foregroundColor(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
@@ -476,7 +476,7 @@ struct ColorPickerRow: View {
                                         .shadow(color: .black.opacity(0.18), radius: 2, x: 0, y: 1)
                                     Circle()
                                         .stroke(
-                                            selected == opt.hex ? Color.accentColor : Color(.systemGray3),
+                                            selected == opt.hex ? appGold : Color(.systemGray3),
                                             lineWidth: selected == opt.hex ? 3 : 1
                                         )
                                         .frame(width: 40, height: 40)
@@ -545,7 +545,7 @@ struct UserImageCard: View {
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2.5)
+                    .stroke(isSelected ? appGold : Color.clear, lineWidth: 2.5)
             )
         }
         .buttonStyle(.plain)
@@ -595,7 +595,7 @@ struct TemplateCard: View {
                         }
                     }
                 }
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 2.5))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(isSelected ? appGold : Color.clear, lineWidth: 2.5))
 
                 Text(template.name)
                     .font(.caption)
@@ -642,9 +642,9 @@ struct FontStyleOption: View {
                 .fontWeight(isSelected ? .semibold : .regular)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
-                .background(isSelected ? Color.accentColor.opacity(0.15) : Color(.systemGray6))
+                .background(isSelected ? appGold.opacity(0.15) : Color(.systemGray6))
                 .foregroundColor(isSelected ? .accentColor : .primary)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(isSelected ? appGold : Color.clear, lineWidth: 1.5))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
     }

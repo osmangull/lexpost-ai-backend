@@ -42,9 +42,9 @@ struct DashboardView: View {
                                 .font(.system(size: 22, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(width: 56, height: 56)
-                                .background(Color.accentColor)
+                                .background(appGold)
                                 .clipShape(Circle())
-                                .shadow(color: Color.accentColor.opacity(0.4), radius: 8, x: 0, y: 4)
+                                .shadow(color: appGold.opacity(0.4), radius: 8, x: 0, y: 4)
                         }
                         .padding(.trailing, 20)
                         .padding(.bottom, 20)
@@ -182,7 +182,7 @@ struct FilterChip: View {
                 .fontWeight(isSelected ? .semibold : .regular)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
-                .background(isSelected ? Color.accentColor : Color(.systemGray6))
+                .background(isSelected ? appGold : Color(.systemGray6))
                 .foregroundColor(isSelected ? .white : .primary)
                 .clipShape(Capsule())
         }

@@ -14,7 +14,7 @@ struct SettingsView: View {
                     HStack(spacing: 14) {
                         ZStack {
                             Circle()
-                                .fill(premium.isPremium ? appGold.opacity(0.15) : Color.accentColor.opacity(0.12))
+                                .fill(premium.isPremium ? appGold.opacity(0.15) : appGold.opacity(0.12))
                                 .frame(width: 52, height: 52)
                             Image(systemName: premium.isPremium ? "crown.fill" : "person.fill")
                                 .font(.title3)
@@ -123,7 +123,7 @@ struct SettingsView: View {
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
-                                .background(viewModel.timeSaved ? Color.green : Color.accentColor)
+                                .background(viewModel.timeSaved ? Color.green : appGold)
                                 .foregroundColor(.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
