@@ -7,7 +7,7 @@ echo "Installing Distribution certificate..."
 echo "$DIST_P12_BASE64" | base64 --decode > /tmp/dist_cert.p12
 
 # Create temporary keychain
-KEYCHAIN_PATH=$RUNNER_TEMP/ci_build.keychain
+KEYCHAIN_PATH=/tmp/ci_build.keychain
 KEYCHAIN_PASSWORD="ci_temp_keychain_pass"
 
 security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
