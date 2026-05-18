@@ -87,6 +87,7 @@ struct PostEditorView: View {
                 }
 
                 // İleri butonu
+                // TODO: v2 premium - if selectedTemplate?.isPro && !PremiumService.shared.isPremium, show PremiumUpgradeDialog instead
                 Button {
                     viewModel.proceedToEditText(for: legalUpdate)
                 } label: {
@@ -129,6 +130,7 @@ struct PostEditorView: View {
         }
     }
 
+    // TODO: v2 premium - gate "Kendi Görsellerim" (PhotosPicker + grid) behind PremiumService.shared.isPremium
     private var userImagesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -503,6 +505,7 @@ struct TemplateCard: View {
                         .fill(Color(.systemGray5))
                         .frame(width: 100, height: 100)
 
+                    // TODO: v2 premium - overlay PRO badge when template.isPro && !PremiumService.shared.isPremium
                     if let urlStr = template.previewUrl ?? template.backgroundUrl,
                        let url = URL(string: urlStr) {
                         AsyncImage(url: url) { image in

@@ -20,10 +20,8 @@ func appDocColor(_ type: String) -> Color {
 
 struct DashboardViewNew: View {
     @StateObject private var viewModel = DashboardViewModel()
-    @StateObject private var premium = PremiumService.shared
     @State private var navigationPath = NavigationPath()
     @State private var showManualEditor = false
-    @State private var showUpgradeDialog = false
     @State private var searchText = ""
     @Environment(\.colorScheme) private var scheme
 
@@ -67,32 +65,17 @@ struct DashboardViewNew: View {
                     Spacer()
                     HStack {
                         Spacer()
+                        // TODO: v2 premium - gate manual editor behind PremiumService.shared.isPremium, show PremiumUpgradeDialog otherwise
                         Button {
-                            if premium.isPremium {
-                                showManualEditor = true
-                            } else {
-                                showUpgradeDialog = true
-                            }
+                            showManualEditor = true
                         } label: {
-                            ZStack(alignment: .topTrailing) {
-                                Image(systemName: "square.and.pencil")
-                                    .font(.system(size: 20, weight: .semibold))
-                                    .foregroundColor(appNavy)
-                                    .frame(width: 56, height: 56)
-                                    .background(appGold)
-                                    .clipShape(Circle())
-                                    .shadow(color: appGold.opacity(0.45), radius: 12, x: 0, y: 5)
-                                if !premium.isPremium {
-                                    Image(systemName: "crown.fill")
-                                        .font(.system(size: 9, weight: .bold))
-                                        .foregroundColor(appNavy)
-                                        .padding(4)
-                                        .background(appGold)
-                                        .clipShape(Circle())
-                                        .overlay(Circle().stroke(appNavy, lineWidth: 1.5))
-                                        .offset(x: 4, y: -4)
-                                }
-                            }
+                            Image(systemName: "square.and.pencil")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(appNavy)
+                                .frame(width: 56, height: 56)
+                                .background(appGold)
+                                .clipShape(Circle())
+                                .shadow(color: appGold.opacity(0.45), radius: 12, x: 0, y: 5)
                         }
                         .padding(.trailing, 20)
                         .padding(.bottom, 24)
@@ -120,13 +103,6 @@ struct DashboardViewNew: View {
             .zIndex(10)
         }
         .sheet(isPresented: $showManualEditor) { ManualPostEditorView() }
-        .sheet(isPresented: $showUpgradeDialog) {
-            PremiumUpgradeDialog(
-                featureTitle: "Görsel İçerik Oluşturucu",
-                featureDescription: "Resmi Gazete yayınlarından profesyonel sosyal medya görseli oluşturmak için Premium'a geçin.",
-                isPresented: $showUpgradeDialog
-            )
-        }
         .task { await viewModel.loadUpdates() }
     }
 

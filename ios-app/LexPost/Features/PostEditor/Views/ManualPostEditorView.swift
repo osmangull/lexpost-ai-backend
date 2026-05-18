@@ -42,6 +42,7 @@ struct ManualPostEditorView: View {
                         } else {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
+                                    // TODO: v2 premium - block selection when template.isPro && !PremiumService.shared.isPremium, show PremiumUpgradeDialog
                                     ForEach(templates) { template in
                                         TemplateCard(
                                             template: template,

@@ -24,9 +24,7 @@ final class PremiumService: ObservableObject {
     @AppStorage("isPremium") private(set) var isPremium: Bool = false
 
     private let client = APIClient.shared
-    private init() {
-        isPremium = true
-    }
+    private init() {}
 
     // MARK: - Promo Kod Doğrulama
 
@@ -49,8 +47,8 @@ final class PremiumService: ObservableObject {
     }
 
     // MARK: - StoreKit (Apple Developer hesabı sonrası)
+    // TODO: v2 premium - implement with StoreKit 2 (Product.products(for:) + product.purchase()), update isPremium on success
     func purchasePremium(plan: PremiumPlan) async -> Bool {
-        // TODO: StoreKit 2
         return false
     }
 }
