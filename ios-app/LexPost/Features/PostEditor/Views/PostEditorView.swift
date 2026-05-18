@@ -5,12 +5,7 @@ struct PostEditorView: View {
     let legalUpdate: LegalUpdate
     @StateObject private var viewModel = PostEditorViewModel()
     @ObservedObject private var userImageStore = UserImageStore.shared
-    @StateObject private var premium = PremiumService.shared
     @Environment(\.dismiss) private var dismiss
-    @State private var showUpgradeDialog = false
-    @State private var showProTemplateDialog = false
-
-    private let mockUserId = "00000000-0000-0000-0000-000000000001"
 
     var body: some View {
         NavigationStack {
@@ -93,12 +88,7 @@ struct PostEditorView: View {
 
                 // İleri butonu
                 Button {
-                    let isProTemplate = viewModel.selectedTemplate?.isPro == true
-                    if isProTemplate && !premium.isPremium {
-                        showProTemplateDialog = true
-                    } else {
-                        viewModel.proceedToEditText(for: legalUpdate)
-                    }
+                    viewModel.proceedToEditText(for: legalUpdate)
                 } label: {
                     Label("İleri: Metni Düzenle", systemImage: "chevron.right")
                         .font(.headline)
@@ -144,66 +134,27 @@ struct PostEditorView: View {
             HStack {
                 Text("Kendi Görsellerim")
                     .font(.headline)
-                // Premium badge
-                ZStack {
-                    Circle()
-                        .strokeBorder(Color.yellow, lineWidth: 1.5)
-                        .frame(width: 18, height: 18)
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundColor(.yellow)
-                }
                 Spacer()
-                if premium.isPremium {
-                    PhotosPicker(selection: Binding(
-                        get: { nil as PhotosPickerItem? },
-                        set: { item in
-                            guard let item else { return }
-                            Task {
-                                if let data = try? await item.loadTransferable(type: Data.self),
-                                   let img = UIImage(data: data) {
-                                    userImageStore.addImage(img)
-                                }
+                PhotosPicker(selection: Binding(
+                    get: { nil as PhotosPickerItem? },
+                    set: { item in
+                        guard let item else { return }
+                        Task {
+                            if let data = try? await item.loadTransferable(type: Data.self),
+                               let img = UIImage(data: data) {
+                                userImageStore.addImage(img)
                             }
                         }
-                    ), matching: .images) {
-                        Label("Ekle", systemImage: "plus.circle.fill")
-                            .font(.subheadline)
-                            .foregroundColor(.accentColor)
                     }
-                } else {
-                    Button {
-                        showUpgradeDialog = true
-                    } label: {
-                        Label("Ekle", systemImage: "plus.circle.fill")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+                ), matching: .images) {
+                    Label("Ekle", systemImage: "plus.circle.fill")
+                        .font(.subheadline)
+                        .foregroundColor(.accentColor)
                 }
             }
             .padding(.horizontal)
 
-            if !premium.isPremium {
-                Button { showUpgradeDialog = true } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(appGold)
-                        Text("Kendi görsellerinizi kullanmak için Premium'a geçin")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(10)
-                    .background(Color(.systemGray6))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal)
-            } else if userImageStore.images.isEmpty {
+            if userImageStore.images.isEmpty {
                 Text("Galeriden görsel eklemek için + butonuna dokunun")
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -225,20 +176,6 @@ struct PostEditorView: View {
                     .padding(.horizontal)
                 }
             }
-        }
-        .sheet(isPresented: $showUpgradeDialog) {
-            PremiumUpgradeDialog(
-                featureTitle: "Kendi Görsellerim",
-                featureDescription: "Markanıza özel arka plan görselleri kullanmak için Premium'a geçin.",
-                isPresented: $showUpgradeDialog
-            )
-        }
-        .sheet(isPresented: $showProTemplateDialog) {
-            PremiumUpgradeDialog(
-                featureTitle: "Pro Şablon",
-                featureDescription: "Bu şablonu kullanmak için Premium'a geçin.",
-                isPresented: $showProTemplateDialog
-            )
         }
     }
 
@@ -389,7 +326,7 @@ struct PostEditorView: View {
                             .padding(.horizontal, 4)
                     }
                     Button {
-                        Task { await viewModel.generatePost(legalUpdateId: legalUpdate.id, userId: mockUserId) }
+                        Task { await viewModel.generatePost(legalUpdateId: legalUpdate.id, userId: UserIdentifierService.userId) }
                     } label: {
                         Group {
                             if viewModel.isGenerating {
@@ -579,21 +516,6 @@ struct TemplateCard: View {
                         Image(systemName: "photo").foregroundColor(.secondary)
                     }
 
-                    if template.isPro {
-                        VStack {
-                            HStack {
-                                Spacer()
-                                Text("PRO")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .padding(.horizontal, 5).padding(.vertical, 2)
-                                    .background(Color.yellow)
-                                    .foregroundColor(.black)
-                                    .clipShape(Capsule())
-                                    .padding(4)
-                            }
-                            Spacer()
-                        }
-                    }
                 }
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(isSelected ? appGold : Color.clear, lineWidth: 2.5))
 

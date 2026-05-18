@@ -5,7 +5,6 @@ import Photos
 struct ManualPostEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var userStore = UserImageStore.shared
-    @StateObject private var premium = PremiumService.shared
 
     @State private var templates: [Template] = []
     @State private var selectedTemplate: Template? = nil
@@ -23,9 +22,7 @@ struct ManualPostEditorView: View {
     @State private var isGenerating = false
     @State private var errorMessage: String? = nil
     @State private var generatedImage: UIImage? = nil
-    @State private var showProTemplateDialog = false
 
-    private let mockUserId = "00000000-0000-0000-0000-000000000001"
     private let charLimit = 450
     private var canGenerate: Bool { selectedTemplate != nil || selectedImage != nil }
 
@@ -50,13 +47,9 @@ struct ManualPostEditorView: View {
                                             template: template,
                                             isSelected: selectedTemplate?.id == template.id && selectedImage == nil
                                         ) {
-                                            if template.isPro && !premium.isPremium {
-                                                showProTemplateDialog = true
-                                            } else {
-                                                selectedTemplate = template
-                                                selectedImage = nil
-                                                selectedStoredImageId = nil
-                                            }
+                                            selectedTemplate = template
+                                            selectedImage = nil
+                                            selectedStoredImageId = nil
                                         }
                                     }
                                 }
@@ -287,18 +280,11 @@ struct ManualPostEditorView: View {
             )) { wrapped in
                 ManualShareView(image: wrapped.image, onDismiss: { dismiss() })
             }
-            .sheet(isPresented: $showProTemplateDialog) {
-                PremiumUpgradeDialog(
-                    featureTitle: "Pro Şablon",
-                    featureDescription: "Bu şablonu kullanmak için Premium'a geçin.",
-                    isPresented: $showProTemplateDialog
-                )
-            }
         }
         .task {
             isLoadingTemplates = true
             templates = (try? await PostService.shared.fetchTemplates()) ?? []
-            selectedTemplate = templates.first(where: { !$0.isPro })
+            selectedTemplate = templates.first
             isLoadingTemplates = false
         }
     }
@@ -320,7 +306,7 @@ struct ManualPostEditorView: View {
                 legalUpdateId: nil,
                 templateId: selectedTemplate?.id,
                 fontStyle: "classic",
-                userId: mockUserId,
+                userId: UserIdentifierService.userId,
                 customText: customText,
                 userImageBase64: userBase64,
                 customCategory: nil,

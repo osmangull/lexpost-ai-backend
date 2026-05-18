@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2169F4042F88446C00955333 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2169F3FF2F88446C00955333 /* NotificationService.swift */; };
 		21B038302FA40D4200BE40DA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21B0382F2FA40D4200BE40DA /* Assets.xcassets */; };
+		9AC481512FBBC4CC0083CE78 /* UserIdentifierService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC481502FBBC4CC0083CE78 /* UserIdentifierService.swift */; };
 		AA000001 /* LexPostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100001 /* LexPostApp.swift */; };
 		AA000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100002 /* ContentView.swift */; };
 		AA000003 /* LegalUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA100003 /* LegalUpdate.swift */; };
@@ -38,6 +39,7 @@
 		2169F3FF2F88446C00955333 /* NotificationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		216C6E692FB1D4D300CE5489 /* LexPostRelease.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = LexPostRelease.entitlements; sourceTree = "<group>"; };
 		21B0382F2FA40D4200BE40DA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9AC481502FBBC4CC0083CE78 /* UserIdentifierService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserIdentifierService.swift; sourceTree = "<group>"; };
 		AA100001 /* LexPostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LexPostApp.swift; sourceTree = "<group>"; };
 		AA100002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		AA100003 /* LegalUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalUpdate.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				AA100023 /* PremiumService.swift */,
 				AA100007 /* PostService.swift */,
 				AA100016 /* UserImageStore.swift */,
+				9AC481502FBBC4CC0083CE78 /* UserIdentifierService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -314,6 +317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000001 /* LexPostApp.swift in Sources */,
+				9AC481512FBBC4CC0083CE78 /* UserIdentifierService.swift in Sources */,
 				AA000002 /* ContentView.swift in Sources */,
 				AA000020 /* OnboardingView.swift in Sources */,
 				AA000021 /* DashboardViewNew.swift in Sources */,

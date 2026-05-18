@@ -8,7 +8,6 @@ private struct OnboardingPage {
     let title: String
     let body: String
     let accentPhrase: String
-    var isPremium: Bool = false
 }
 
 private let pages: [OnboardingPage] = [
@@ -38,16 +37,14 @@ private let pages: [OnboardingPage] = [
         isEmoji: false,
         title: "Görsel İçerik Oluşturucu",
         body: "Resmi Gazete yayınlarından profesyonel sosyal medya görseli saniyeler içinde oluşturun.",
-        accentPhrase: "saniyeler içinde",
-        isPremium: true
+        accentPhrase: "saniyeler içinde"
     ),
     OnboardingPage(
         icon: "photo.on.rectangle.angled",
         isEmoji: false,
         title: "Kendi Görselleriniz",
         body: "Markanıza özel arka plan görselleri kullanarak içeriklerinizi kişiselleştirin.",
-        accentPhrase: "kişiselleştirin",
-        isPremium: true
+        accentPhrase: "kişiselleştirin"
     ),
 ]
 
@@ -252,60 +249,38 @@ private struct PageSlide: View {
             Spacer()
 
             // Icon
-            ZStack(alignment: .topTrailing) {
-                ZStack {
-                    // Glow ring
-                    Circle()
-                        .fill(gold.opacity(0.08))
-                        .frame(width: 160, height: 160)
-                        .blur(radius: 20)
-                        .scaleEffect(appeared ? 1 : 0.5)
-
-                    Circle()
-                        .stroke(gold.opacity(0.18), lineWidth: 1)
-                        .frame(width: 140, height: 140)
-                        .scaleEffect(appeared ? 1 : 0.6)
-
-                    if page.isEmoji {
-                        Text(page.icon)
-                            .font(.system(size: 72))
-                            .scaleEffect(appeared ? 1 : 0.5)
-                            .opacity(appeared ? 1 : 0)
-                    } else {
-                        Image(systemName: page.icon)
-                            .font(.system(size: 64, weight: .light))
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [gold, gold2],
-                                    startPoint: .topLeading, endPoint: .bottomTrailing
-                                )
-                            )
-                            .scaleEffect(appeared ? 1 : 0.5)
-                            .opacity(appeared ? 1 : 0)
-                    }
-                }
-                .frame(width: 160, height: 160)
-
-                // Premium crown badge
-                if page.isPremium {
-                    HStack(spacing: 4) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 9, weight: .bold))
-                        Text("PRO")
-                            .font(.system(size: 9, weight: .bold, design: .monospaced))
-                            .kerning(1)
-                    }
-                    .foregroundColor(Color(red: 0.051, green: 0.106, blue: 0.165))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(gold)
-                    .clipShape(Capsule())
-                    .shadow(color: gold.opacity(0.4), radius: 6, x: 0, y: 2)
+            ZStack {
+                // Glow ring
+                Circle()
+                    .fill(gold.opacity(0.08))
+                    .frame(width: 160, height: 160)
+                    .blur(radius: 20)
                     .scaleEffect(appeared ? 1 : 0.5)
-                    .opacity(appeared ? 1 : 0)
-                    .offset(x: 8, y: -4)
+
+                Circle()
+                    .stroke(gold.opacity(0.18), lineWidth: 1)
+                    .frame(width: 140, height: 140)
+                    .scaleEffect(appeared ? 1 : 0.6)
+
+                if page.isEmoji {
+                    Text(page.icon)
+                        .font(.system(size: 72))
+                        .scaleEffect(appeared ? 1 : 0.5)
+                        .opacity(appeared ? 1 : 0)
+                } else {
+                    Image(systemName: page.icon)
+                        .font(.system(size: 64, weight: .light))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [gold, gold2],
+                                startPoint: .topLeading, endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(appeared ? 1 : 0.5)
+                        .opacity(appeared ? 1 : 0)
                 }
             }
+            .frame(width: 160, height: 160)
             .padding(.bottom, 48)
 
             // Title
