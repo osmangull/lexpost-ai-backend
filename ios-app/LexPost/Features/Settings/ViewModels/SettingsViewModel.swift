@@ -9,27 +9,9 @@ final class SettingsViewModel: ObservableObject {
     @Published var isSaving: Bool = false
     @Published var timeSaved: Bool = false
 
-    // Promo kod
-    @Published var promoCode: String = ""
-    @Published var promoStatus: PromoStatus = .idle
-    @Published var isValidatingPromo: Bool = false
-
     private let service = NotificationService.shared
     private let premiumService = PremiumService.shared
     private var saveTask: Task<Void, Never>?
-
-    enum PromoStatus: Equatable {
-        case idle, success, invalid, networkError
-        var message: String? {
-            switch self {
-            case .idle:         return nil
-            case .success:      return "Promosyon kodu onaylandı! Premium aktif."
-            case .invalid:      return "Geçersiz promosyon kodu."
-            case .networkError: return "Bağlantı hatası. Tekrar deneyin."
-            }
-        }
-        var isError: Bool { self == .invalid || self == .networkError }
-    }
 
     func loadSettings() {
         notificationsEnabled = service.notificationsEnabled
@@ -85,16 +67,4 @@ final class SettingsViewModel: ObservableObject {
         }
     }
 
-    func submitPromoCode() async {
-        guard !promoCode.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        isValidatingPromo = true
-        promoStatus = .idle
-        let result = await premiumService.validatePromoCode(promoCode)
-        switch result {
-        case .success:      promoStatus = .success
-        case .invalid:      promoStatus = .invalid
-        case .networkError: promoStatus = .networkError
-        }
-        isValidatingPromo = false
-    }
 }
