@@ -4,7 +4,6 @@ struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
     @StateObject private var premium = PremiumService.shared
     @AppStorage("isDarkMode") private var isDarkMode = true
-    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -28,20 +27,9 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                         }
                         Spacer()
-                        if !premium.isPremium {
-                            Button("Premium'a Geç") { showPaywall = true }
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(appGold.opacity(0.15))
-                                .foregroundColor(appGold)
-                                .clipShape(Capsule())
-                        }
                     }
                     .padding(.vertical, 4)
                 }
-                .sheet(isPresented: $showPaywall) { PremiumPaywallView() }
 
                 // Tema
                 Section("Tercihler") {
@@ -132,44 +120,6 @@ struct SettingsView: View {
                             Text("Her gün seçilen saatte bildirim alırsınız.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-
-                // Promosyon Kodu
-                if !premium.isPremium {
-                    Section("Promosyon Kodu") {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack(spacing: 10) {
-                                Image(systemName: "tag.fill")
-                                    .foregroundColor(appGold)
-                                    .font(.subheadline)
-                                TextField("Kodu girin", text: $viewModel.promoCode)
-                                    .textInputAutocapitalization(.characters)
-                                    .autocorrectionDisabled()
-                                    .submitLabel(.done)
-                                    .onSubmit { Task { await viewModel.submitPromoCode() } }
-                                if viewModel.isValidatingPromo {
-                                    ProgressView().scaleEffect(0.8)
-                                } else if !viewModel.promoCode.isEmpty {
-                                    Button {
-                                        Task { await viewModel.submitPromoCode() }
-                                    } label: {
-                                        Text("Uygula")
-                                            .font(.caption.weight(.semibold))
-                                            .padding(.horizontal, 10).padding(.vertical, 5)
-                                            .background(appGold.opacity(0.15))
-                                            .foregroundColor(appGold)
-                                            .clipShape(Capsule())
-                                    }
-                                }
-                            }
-                            if let msg = viewModel.promoStatus.message {
-                                Label(msg, systemImage: viewModel.promoStatus.isError ? "xmark.circle.fill" : "checkmark.circle.fill")
-                                    .font(.caption)
-                                    .foregroundColor(viewModel.promoStatus.isError ? .red : .green)
-                            }
                         }
                         .padding(.vertical, 4)
                     }

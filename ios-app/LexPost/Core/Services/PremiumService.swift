@@ -24,7 +24,9 @@ final class PremiumService: ObservableObject {
     @AppStorage("isPremium") private(set) var isPremium: Bool = false
 
     private let client = APIClient.shared
-    private init() {}
+    private init() {
+        isPremium = true
+    }
 
     // MARK: - Promo Kod Doğrulama
 
